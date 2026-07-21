@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/* ===========================================================
+   CHARTE GRAPHIQUE — Église Évangélique La Grâce
+   Couleurs : blanc, vert, rouge (+ or discret).
+   IMPORTANT : aucun dégradé (pas de gradient).
+   =========================================================== */
+@theme {
+  /* Vert — couleur principale */
+  --color-brand-50: #eef7f1;
+  --color-brand-100: #d4ecdb;
+  --color-brand-200: #a9d8b8;
+  --color-brand-300: #74bd8e;
+  --color-brand-400: #439f68;
+  --color-brand-500: #1f7a43;
+  --color-brand-600: #176537;
+  --color-brand-700: #134e2b;
+  --color-brand-800: #0e3a20;
+  --color-brand-900: #082315;
+
+  /* Rouge — accent */
+  --color-accent-50: #fdf2f2;
+  --color-accent-100: #fbe0e0;
+  --color-accent-500: #c1272d;
+  --color-accent-600: #a51f25;
+  --color-accent-700: #7f181c;
+
+  /* Or — accent discret */
+  --color-gold-400: #d4af37;
+  --color-gold-500: #bf9b30;
+
+  /* Neutres */
+  --color-ink: #12241a;
+  --color-body: #3f4f46;
+  --color-cream: #f6f8f4;
+  --color-line: #e4e9e1;
+
+  /* Polices */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+}
+
+/* Keyframes au niveau racine (compatibilité navigateurs) */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(193, 39, 45, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(193, 39, 45, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(193, 39, 45, 0);
+  }
+}
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-body);
+    background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-500);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-brand-400);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  .container-x {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  /* Révélation au défilement */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-marquee {
+    animation: marquee 32s linear infinite;
+  }
+  .marquee-pause:hover .animate-marquee {
+    animation-play-state: paused;
+  }
+
+  .live-dot {
+    animation: pulse-ring 1.8s infinite;
+  }
+
+  .animate-float {
+    animation: float-soft 6s ease-in-out infinite;
+  }
+}
+
+/* ===========================================================
+   LEAFLET — marqueurs personnalisés (HTML, sans images) pour
+   la charte graphique.
+   =========================================================== */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #d4ecdb;
+}
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+.leaflet-bar a {
+  background-color: #ffffff;
+  color: var(--color-brand-700);
+  border-color: var(--color-line) !important;
+}
+.leaflet-bar a:hover {
+  background-color: var(--color-brand-50);
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(8, 35, 21, 0.18);
+}
+.leaflet-popup-content {
+  margin: 14px 16px;
+  font-family: var(--font-sans);
+}
+.grace-pin {
+  background: var(--color-brand-500);
+  border: 3px solid #ffffff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 4px 10px rgba(8, 35, 21, 0.35);
+}
+.grace-pin span {
+  transform: rotate(45deg);
+  display: block;
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  text-align: center;
+  line-height: 16px;
+}
+.grace-pin.is-hq {
+  background: var(--color-accent-500);
+  width: 26px;
+  height: 26px;
+}
