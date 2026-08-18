@@ -86,7 +86,7 @@ export const heroStats = [
 
 export const about = {
   intro:
-    "L'Église des Envoyés de Jésus Christ est une communauté chrétienne fondée en 2000 sur l'appel de porter l'Évangile de la grâce à toutes les nations. Née d'un petit groupe de prière à Abidjan, elle est aujourd'hui une famille de plus de 12 000 fidèles répartis dans plusieurs annexes.",
+    "L'Église des Envoyés de Jésus Christ est une communauté chrétienne fondée en 2000 sur l'appel d'annoncer la bonne nouvelle à toutes les nations. Née d'un petit groupe de prière à Lomé, elle est aujourd'hui une famille de plus de 12 000 fidèles répartis dans plusieurs annexes.",
   historyTitle: "Notre histoire",
   history:
     "Tout a commencé dans un modeste salon, autour de l'Apôtre LE BRAVE et de quelques âmes affamées de Dieu. De cette communion naquit une vision claire : annoncer un Christ vivant, sauver les perdus, guérir les blessés et former des disciples. Au fil des années, l'œuvre s'est étendue au-delà des frontières, plantant des annexes au Togo, en Afrique de l'Ouest et auprès de la diaspora.",

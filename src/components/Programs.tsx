@@ -1,5 +1,6 @@
 import { MapPin, CalendarDays, Megaphone, Download } from "lucide-react";
-import { schedule, announcements, church } from "@/data/site";
+import { schedule, church } from "@/data/site";
+import { useAnnouncements } from "@/hooks/useAnnouncements";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Reveal } from "@/components/Reveal";
 import { Icon } from "@/components/icons";
@@ -13,6 +14,7 @@ const tagStyle: Record<string, string> = {
 };
 
 export function Programs() {
+  const { announcements } = useAnnouncements();
   return (
     <section id="programmes" className="bg-cream py-20 sm:py-28">
       <div className="container-x">

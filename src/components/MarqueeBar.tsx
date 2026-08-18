@@ -1,8 +1,9 @@
 import { Megaphone } from "lucide-react";
-import { announcements } from "@/data/site";
+import { useAnnouncements } from "@/hooks/useAnnouncements";
 
 /** Bandeau d'annonces défilant (effet marquee). */
 export function MarqueeBar() {
+  const { announcements } = useAnnouncements();
   const items = announcements.map((a) => a.title);
   const row = [...items, ...items];
 

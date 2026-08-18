@@ -8,11 +8,29 @@ import { btnPrimary } from "@/components/ui";
 export function Footer() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const year = new Date().getFullYear();
 
-  const subscribe = (e: FormEvent) => {
+  const subscribe = async (e: FormEvent) => {
     e.preventDefault();
-    if (email.trim()) setDone(true);
+    if (!email.trim()) return;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.message || "Échec de l'inscription.");
+      setDone(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Échec de l'inscription.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -107,8 +125,15 @@ export function Footer() {
                   placeholder="Votre email"
                   className="w-full rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-brand-100/60 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
-                <button type="submit" className={`${btnPrimary} justify-center`}>
-                  <Send className="h-4 w-4" /> S'abonner
+                {error && (
+                  <p className="text-xs font-medium text-red-300">{error}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className={`${btnPrimary} justify-center disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  <Send className="h-4 w-4" /> {busy ? "Inscription…" : "S'abonner"}
                 </button>
               </form>
             )}
@@ -123,6 +148,12 @@ export function Footer() {
             Fait avec <Heart className="h-3 w-3 fill-current text-accent-500" /> pour la gloire de Dieu
           </p>
           <p className="hidden italic sm:block">« {church.tagline} »</p>
+          <a
+            href="/admin"
+            className="italic opacity-50 transition-opacity hover:opacity-100"
+          >
+            Espace admin
+          </a>
         </div>
       </div>
     </footer>
