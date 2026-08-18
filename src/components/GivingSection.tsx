@@ -3,9 +3,9 @@ import { Reveal } from "@/components/Reveal";
 import { btnGold, btnOutlineLight } from "@/components/ui";
 
 const methods = [
-  { label: "Orange Money", value: "07 00 00 00 01" },
-  { label: "MTN MoMo", value: "05 00 00 00 02" },
-  { label: "Wave", value: "01 00 00 00 03" },
+  { label: "Miss by yas", value: "07 00 00 00 01" },
+  { label: "Flooz", value: "05 00 00 00 02" },
+  // { label: "Wave", value: "01 00 00 00 03" },
   { label: "Virement bancaire", value: "CIEG CI · 0123 4567 890" },
 ];
 
