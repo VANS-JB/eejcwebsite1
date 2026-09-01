@@ -1,13 +1,6 @@
-import { Heart, UserPlus, ArrowRight } from "lucide-react";
+import { Heart, UserPlus, ArrowRight, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { btnGold, btnOutlineLight } from "@/components/ui";
-
-const methods = [
-  { label: "Miss by yas", value: "07 00 00 00 01" },
-  { label: "Flooz", value: "05 00 00 00 02" },
-  // { label: "Wave", value: "01 00 00 00 03" },
-  { label: "Virement bancaire", value: "CIEG CI · 0123 4567 890" },
-];
 
 export function GivingSection() {
   return (
@@ -49,24 +42,16 @@ export function GivingSection() {
 
         <Reveal delay={120}>
           <div className="rounded-3xl bg-white/10 p-6 ring-1 ring-white/15 backdrop-blur-sm sm:p-8">
-            <h3 className="text-lg font-bold text-white">Modalités de don</h3>
-            <p className="mt-1 text-sm text-brand-100">
-              Référence à indiquer : <span className="font-semibold text-gold-400">« Don — EEJ-C »</span>
+            <ShieldCheck className="h-10 w-10 text-gold-400" />
+            <h3 className="mt-4 text-lg font-bold text-white">Donner en toute sécurité</h3>
+            <p className="mt-3 text-sm leading-relaxed text-brand-100">
+              Pour éviter toute erreur ou fraude, les coordonnées de paiement sont communiquées
+              directement par le secrétariat de l'EEJ-C. Vérifiez toujours le bénéficiaire avant
+              de confirmer un transfert.
             </p>
-            <ul className="mt-5 space-y-3">
-              {methods.map((m) => (
-                <li
-                  key={m.label}
-                  className="flex items-center justify-between gap-3 rounded-xl bg-white/10 px-4 py-3"
-                >
-                  <span className="text-sm font-semibold text-white">{m.label}</span>
-                  <span className="font-mono text-sm text-gold-400">{m.value}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 text-xs text-brand-100">
-              Merci d'envoyer votre reçu au secrétariat pour reçu officiel et suivi.
-            </p>
+            <a href="#contact" className={`${btnGold} mt-6`}>
+              Contacter le secrétariat <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
         </Reveal>
       </div>

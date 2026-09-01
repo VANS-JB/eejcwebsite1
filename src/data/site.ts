@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTENU DU SITE — Église Évangélique La Grâce
+   CONTENU DU SITE — EEJ-C, Église des Envoyés de Jésus-Christ
    ------------------------------------------------------------
    👉 Système de mise à jour simple :
    TOUT le texte, les images, les programmes, les annonces
@@ -28,7 +28,7 @@ export const church = {
     addressShort: "Alaglo, Lomé",
     phone: "+228 90 10 72 00",
     phone2: "+228 07 00 00 00 00",
-    email: "contact@eglise-lagrace.org",
+    email: "contact@eej-c.org",
     hours: "Secrétariat : Lun–Ven, 9h00 – 17h00",
   },
   social: {

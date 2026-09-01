@@ -204,6 +204,8 @@ export function Contact() {
                       <input
                         id="name"
                         type="text"
+                        maxLength={100}
+                        autoComplete="name"
                         value={form.name}
                         onChange={(e) => set("name", e.target.value)}
                         placeholder="Votre nom"
@@ -218,6 +220,8 @@ export function Contact() {
                       <input
                         id="email"
                         type="email"
+                        maxLength={254}
+                        autoComplete="email"
                         value={form.email}
                         onChange={(e) => set("email", e.target.value)}
                         placeholder="vous@exemple.com"
@@ -232,6 +236,8 @@ export function Contact() {
                       <input
                         id="phone"
                         type="tel"
+                        maxLength={40}
+                        autoComplete="tel"
                         value={form.phone}
                         onChange={(e) => set("phone", e.target.value)}
                         placeholder="+228 ..."
@@ -265,6 +271,7 @@ export function Contact() {
                     <textarea
                       id="message"
                       rows={5}
+                      maxLength={5000}
                       value={form.message}
                       onChange={(e) => set("message", e.target.value)}
                       placeholder="Écrivez votre message ici..."
@@ -280,9 +287,9 @@ export function Contact() {
                   >
                     <Send className="h-4 w-4" /> {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
                   </button>
-                  {submitError && <p className="mt-3 text-sm text-accent-600">{submitError}</p>}
+                  {submitError && <p role="alert" className="mt-3 text-sm text-accent-600">{submitError}</p>}
                   <p className="mt-3 text-xs text-body">
-                    * Champs obligatoires. Vos données restent confidentielles.
+                    * Champs obligatoires. Vos données servent uniquement à traiter votre demande.
                   </p>
                 </form>
               )}

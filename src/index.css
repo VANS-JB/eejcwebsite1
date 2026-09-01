@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ===========================================================
-   CHARTE GRAPHIQUE — Église Évangélique La Grâce
+   CHARTE GRAPHIQUE — EEJ-C, Église des Envoyés de Jésus-Christ
    Couleurs : blanc, vert, rouge (+ or discret).
    IMPORTANT : aucun dégradé (pas de gradient).
    =========================================================== */
@@ -139,6 +139,9 @@
   .marquee-pause:hover .animate-marquee {
     animation-play-state: paused;
   }
+  .marquee-pause:focus-within .animate-marquee {
+    animation-play-state: paused;
+  }
 
   .live-dot {
     animation: pulse-ring 1.8s infinite;
@@ -146,6 +149,24 @@
 
   .animate-float {
     animation: float-soft 6s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
 

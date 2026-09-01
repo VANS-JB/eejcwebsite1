@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, Pause, Play } from "lucide-react";
 import { slides, heroStats } from "@/data/site";
 import { Counter } from "@/components/Counter";
 import { btnPrimary, btnOutlineLight } from "@/components/ui";
@@ -8,15 +8,24 @@ import { cn } from "@/utils/cn";
 export function Hero() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const next = useCallback(() => setI((p) => (p + 1) % slides.length), []);
   const prev = () => setI((p) => (p - 1 + slides.length) % slides.length);
 
   useEffect(() => {
-    if (paused) return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (paused || reducedMotion) return;
     const t = setInterval(next, 6000);
     return () => clearInterval(t);
-  }, [paused, next]);
+  }, [paused, reducedMotion, next]);
 
   return (
     <section
@@ -24,6 +33,7 @@ export function Hero() {
       className="relative h-[88vh] min-h-[600px] w-full overflow-hidden bg-brand-800"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
       aria-label="Présentation de l'église"
     >
       {/* Slides */}
@@ -132,6 +142,15 @@ export function Hero() {
           />
         ))}
       </div>
+
+      <button
+        type="button"
+        onClick={() => setPaused((value) => !value)}
+        aria-label={paused ? "Reprendre le carrousel" : "Mettre le carrousel en pause"}
+        className="absolute bottom-28 right-5 z-20 hidden rounded-full bg-black/40 p-2.5 text-white ring-1 ring-white/25 transition hover:bg-black/60 sm:block"
+      >
+        {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+      </button>
     </section>
   );
 }

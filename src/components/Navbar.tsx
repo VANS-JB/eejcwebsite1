@@ -19,6 +19,15 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
+
+  useEffect(() => {
     const ids = navItems.map((n) => n.href.slice(1));
     const sections = ids
       .map((id) => document.getElementById(id))
@@ -120,6 +129,7 @@ export function Navbar() {
               className="rounded-lg p-2 text-ink transition hover:bg-brand-50 lg:hidden"
               aria-label="Ouvrir le menu"
               aria-expanded={open}
+              aria-controls="navigation-mobile"
             >
               {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -129,6 +139,9 @@ export function Navbar() {
 
       {/* Menu mobile */}
       <div
+        id="navigation-mobile"
+        aria-hidden={!open}
+        inert={!open}
         className={cn(
           "overflow-hidden bg-white shadow-lg transition-[max-height] duration-300 ease-in-out lg:hidden",
           open ? "max-h-[34rem]" : "max-h-0"

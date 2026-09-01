@@ -8,7 +8,11 @@ export function MarqueeBar() {
   const row = [...items, ...items];
 
   return (
-    <div className="marquee-pause overflow-hidden bg-brand-700 text-white">
+    <div
+      className="marquee-pause overflow-hidden bg-brand-700 text-white"
+      tabIndex={0}
+      aria-label="Annonces de l'EEJ-C. Placez le focus ici pour suspendre le défilement."
+    >
       <div className="container-x flex items-center">
         <span className="flex shrink-0 items-center gap-2 py-2.5 pr-4 text-xs font-bold uppercase tracking-wider">
           <Megaphone className="h-4 w-4 text-gold-400" /> Annonces

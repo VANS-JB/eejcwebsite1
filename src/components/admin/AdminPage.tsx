@@ -216,18 +216,24 @@ export function AdminPage() {
                 <div className="space-y-3">
                   <div className="grid gap-3 sm:grid-cols-3">
                     <input
+                      aria-label="Date de l'annonce"
+                      maxLength={80}
                       value={draft.date}
                       onChange={(e) => setDraft({ ...draft, date: e.target.value })}
                       placeholder="Date (ex : Dimanche prochain)"
                       className={inputCls}
                     />
                     <input
+                      aria-label="Catégorie de l'annonce"
+                      maxLength={40}
                       value={draft.tag}
                       onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
                       placeholder="Catégorie (ex : Campagne)"
                       className={inputCls}
                     />
                     <input
+                      aria-label="Titre de l'annonce"
+                      maxLength={160}
                       value={draft.title}
                       onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                       placeholder="Titre"
@@ -235,6 +241,8 @@ export function AdminPage() {
                     />
                   </div>
                   <textarea
+                    aria-label="Texte de l'annonce"
+                    maxLength={1000}
                     value={draft.text}
                     onChange={(e) => setDraft({ ...draft, text: e.target.value })}
                     placeholder="Texte de l'annonce"
@@ -298,18 +306,24 @@ export function AdminPage() {
           <div className="mt-4 space-y-3">
             <div className="grid gap-3 sm:grid-cols-3">
               <input
+                aria-label="Date de la nouvelle annonce"
+                maxLength={80}
                 value={draft.date}
                 onChange={(e) => setDraft({ ...draft, date: e.target.value })}
                 placeholder="Date (ex : Dimanche prochain)"
                 className={inputCls}
               />
               <input
+                aria-label="Catégorie de la nouvelle annonce"
+                maxLength={40}
                 value={draft.tag}
                 onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
                 placeholder="Catégorie (ex : Campagne)"
                 className={inputCls}
               />
               <input
+                aria-label="Titre de la nouvelle annonce"
+                maxLength={160}
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                 placeholder="Titre"
@@ -317,6 +331,8 @@ export function AdminPage() {
               />
             </div>
             <textarea
+              aria-label="Texte de la nouvelle annonce"
+              maxLength={1000}
               value={draft.text}
               onChange={(e) => setDraft({ ...draft, text: e.target.value })}
               placeholder="Texte de l'annonce"

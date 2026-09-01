@@ -17,13 +17,15 @@ export function Counter({ value, suffix = "", duration = 1900 }: CounterProps) {
     if (!inView || started.current) return;
     started.current = true;
     const start = performance.now();
+    let frame = 0;
     const tick = (now: number) => {
       const p = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3);
       setN(Math.round(eased * value));
-      if (p < 1) requestAnimationFrame(tick);
+      if (p < 1) frame = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
   }, [inView, value, duration]);
 
   return (
