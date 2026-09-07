@@ -14,10 +14,11 @@ export function Logo({ variant = "dark", className, mark = 44 }: LogoProps) {
     <span className={cn("flex items-center gap-3", className)}>
      
         <img
-            src="/LogoEEJC.jpeg" 
+            src="/LogoEEJC-web.jpeg"
             alt="Logo de l'église" 
             width={mark}
             height={mark}
+            decoding="async"
 
          />
       

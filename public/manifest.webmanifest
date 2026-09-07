@@ -7,9 +7,9 @@
   "theme_color": "#1f7a43",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/LogoEEJC-web.jpeg",
+      "sizes": "256x256",
+      "type": "image/jpeg"
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, Pause, Play } from "lucide-react";
 import { slides, heroStats } from "@/data/site";
 import { Counter } from "@/components/Counter";
 import { btnPrimary, btnOutlineLight } from "@/components/ui";
@@ -8,15 +8,56 @@ import { cn } from "@/utils/cn";
 export function Hero() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [loadedSlides, setLoadedSlides] = useState(() => new Set([0]));
 
-  const next = useCallback(() => setI((p) => (p + 1) % slides.length), []);
-  const prev = () => setI((p) => (p - 1 + slides.length) % slides.length);
+  const showSlide = useCallback((index: number) => {
+    setLoadedSlides((current) => {
+      if (current.has(index)) return current;
+      return new Set(current).add(index);
+    });
+    setI(index);
+  }, []);
+  const next = useCallback(() => {
+    setI((current) => {
+      const target = (current + 1) % slides.length;
+      setLoadedSlides((loaded) => new Set(loaded).add(target));
+      return target;
+    });
+  }, []);
+  const prev = () => showSlide((i - 1 + slides.length) % slides.length);
 
   useEffect(() => {
-    if (paused) return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (paused || reducedMotion) return;
     const t = setInterval(next, 6000);
     return () => clearInterval(t);
-  }, [paused, next]);
+  }, [paused, reducedMotion, next]);
+
+  useEffect(() => {
+    const preloadRemaining = () => {
+      slides.slice(1).forEach((slide, offset) => {
+        const image = new Image();
+        image.src = slide.image;
+        image.onload = () => {
+          setLoadedSlides((current) => new Set(current).add(offset + 1));
+        };
+      });
+    };
+    if (document.readyState === "complete") {
+      const timer = window.setTimeout(preloadRemaining, 1500);
+      return () => window.clearTimeout(timer);
+    }
+    window.addEventListener("load", preloadRemaining, { once: true });
+    return () => window.removeEventListener("load", preloadRemaining);
+  }, []);
 
   return (
     <section
@@ -24,6 +65,7 @@ export function Hero() {
       className="relative h-[88vh] min-h-[600px] w-full overflow-hidden bg-brand-800"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
       aria-label="Présentation de l'église"
     >
       {/* Slides */}
@@ -37,8 +79,10 @@ export function Hero() {
           aria-hidden={idx !== i}
         >
           <img
-            src={s.image}
+            src={loadedSlides.has(idx) ? s.image : undefined}
             alt=""
+            fetchPriority={idx === 0 ? "high" : "low"}
+            decoding="async"
             className={cn(
               "h-full w-full object-cover transition-transform duration-[7000ms] ease-out",
               idx === i ? "scale-110" : "scale-100"
@@ -123,7 +167,7 @@ export function Hero() {
         {slides.map((_, idx) => (
           <button
             key={idx}
-            onClick={() => setI(idx)}
+            onClick={() => showSlide(idx)}
             aria-label={`Aller à la diapositive ${idx + 1}`}
             className={cn(
               "h-2 rounded-full transition-all duration-300",
@@ -132,6 +176,15 @@ export function Hero() {
           />
         ))}
       </div>
+
+      <button
+        type="button"
+        onClick={() => setPaused((value) => !value)}
+        aria-label={paused ? "Reprendre le carrousel" : "Mettre le carrousel en pause"}
+        className="absolute bottom-28 right-5 z-20 hidden rounded-full bg-black/40 p-2.5 text-white ring-1 ring-white/25 transition hover:bg-black/60 sm:block"
+      >
+        {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+      </button>
     </section>
   );
 }

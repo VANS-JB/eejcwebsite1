@@ -4,16 +4,20 @@ import {
   Check,
   Lock,
   LogOut,
+  Mail,
   Megaphone,
   Pencil,
   Plus,
   Save,
+  Send,
   Trash2,
+  Users,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { btnPrimary } from "@/components/ui";
 
 type Announcement = { date: string; tag: string; title: string; text: string };
+type Subscriber = { email: string; subscribedAt: string };
 
 const empty: Announcement = { date: "", tag: "Annonce", title: "", text: "" };
 const TOKEN_KEY = "eejc_admin_token";
@@ -27,14 +31,26 @@ export function AdminPage() {
   const [draft, setDraft] = useState<Announcement>(empty);
   const [editing, setEditing] = useState<number | null>(null);
   const [saved, setSaved] = useState(false);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [campaign, setCampaign] = useState({ subject: "", message: "" });
+  const [campaignBusy, setCampaignBusy] = useState(false);
+  const [campaignNotice, setCampaignNotice] = useState("");
 
   useEffect(() => {
     if (!token) return;
-    fetch("/api/admin/announcements", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => setAnnouncements(d.announcements))
+    const headers = { Authorization: `Bearer ${token}` };
+    Promise.all([
+      fetch("/api/admin/announcements", { headers }),
+      fetch("/api/admin/newsletter", { headers }),
+    ])
+      .then(async ([announcementsResponse, newsletterResponse]) => {
+        if (!announcementsResponse.ok || !newsletterResponse.ok) throw new Error();
+        return Promise.all([announcementsResponse.json(), newsletterResponse.json()]);
+      })
+      .then(([announcementsData, newsletterData]) => {
+        setAnnouncements(announcementsData.announcements);
+        setSubscribers(newsletterData.subscribers);
+      })
       .catch(() => {
         setToken("");
         sessionStorage.removeItem(TOKEN_KEY);
@@ -72,6 +88,7 @@ export function AdminPage() {
     sessionStorage.removeItem(TOKEN_KEY);
     setToken("");
     setAnnouncements([]);
+    setSubscribers([]);
   };
 
   const startEdit = (i: number) => {
@@ -122,6 +139,33 @@ export function AdminPage() {
       setError(err instanceof Error ? err.message : "Échec de l'enregistrement.");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const sendCampaign = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!campaign.subject.trim() || !campaign.message.trim()) return;
+    if (!confirm(`Envoyer cette newsletter à ${subscribers.length} abonné(s) ?`)) return;
+    setCampaignBusy(true);
+    setCampaignNotice("");
+    setError("");
+    try {
+      const response = await fetch("/api/admin/newsletter/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(campaign),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Échec de l'envoi de la newsletter.");
+      setCampaignNotice(data.message);
+      setCampaign({ subject: "", message: "" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Échec de l'envoi de la newsletter.");
+    } finally {
+      setCampaignBusy(false);
     }
   };
 
@@ -332,6 +376,91 @@ export function AdminPage() {
             </button>
           </div>
         </div>
+
+        {/* Newsletter */}
+        <section className="mt-12 rounded-3xl border border-line bg-white p-6 shadow-sm sm:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="flex items-center gap-2 text-xl font-bold text-ink">
+                <Mail className="h-5 w-5 text-brand-600" /> Newsletter
+              </h2>
+              <p className="mt-1 text-sm text-body">
+                Envoyez une information aux personnes ayant donné leur consentement.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700">
+              <Users className="h-4 w-4" /> {subscribers.length} abonné{subscribers.length > 1 ? "s" : ""}
+            </span>
+          </div>
+
+          <div className="mt-6 grid gap-8 lg:grid-cols-5">
+            <form onSubmit={sendCampaign} className="space-y-4 lg:col-span-3">
+              <div>
+                <label htmlFor="campaign-subject" className="mb-1.5 block text-sm font-semibold text-ink">
+                  Sujet de l'email
+                </label>
+                <input
+                  id="campaign-subject"
+                  maxLength={160}
+                  required
+                  value={campaign.subject}
+                  onChange={(event) => setCampaign({ ...campaign, subject: event.target.value })}
+                  placeholder="Ex. Programme spécial de dimanche"
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label htmlFor="campaign-message" className="mb-1.5 block text-sm font-semibold text-ink">
+                  Message
+                </label>
+                <textarea
+                  id="campaign-message"
+                  rows={7}
+                  maxLength={5000}
+                  required
+                  value={campaign.message}
+                  onChange={(event) => setCampaign({ ...campaign, message: event.target.value })}
+                  placeholder="Rédigez le contenu de la newsletter…"
+                  className={inputCls}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={campaignBusy || !subscribers.length}
+                className={`${btnPrimary} disabled:cursor-not-allowed disabled:opacity-40`}
+              >
+                <Send className="h-4 w-4" />
+                {campaignBusy ? "Envoi en cours…" : `Envoyer à ${subscribers.length} abonné(s)`}
+              </button>
+              {campaignNotice && (
+                <p role="status" className="text-sm font-semibold text-green-600">{campaignNotice}</p>
+              )}
+            </form>
+
+            <div className="lg:col-span-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-ink">Abonnés</h3>
+              <div className="mt-3 max-h-72 overflow-y-auto rounded-2xl border border-line">
+                {subscribers.length ? (
+                  <ul className="divide-y divide-line">
+                    {subscribers.map((subscriber) => (
+                      <li key={subscriber.email} className="px-4 py-3">
+                        <div className="break-all text-sm font-medium text-ink">{subscriber.email}</div>
+                        <div className="mt-0.5 text-xs text-body">
+                          Inscrit le {new Date(subscriber.subscribedAt).toLocaleDateString("fr-FR")}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="p-5 text-center text-sm text-body">Aucun abonné pour le moment.</p>
+                )}
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-body">
+                Chaque email contient automatiquement un lien personnel de désinscription.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Barre d'enregistrement */}
         <div className="sticky bottom-4 mt-8 flex items-center justify-between gap-4 rounded-2xl border border-line bg-white px-5 py-4 shadow-lg">
