@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Marker as LeafletMarker } from "leaflet";
-import { MapPin, User, Clock, Phone, Navigation, Star } from "lucide-react";
+import { MapPin, User, Clock, Phone, Navigation, Star, ExternalLink } from "lucide-react";
 import { annexes } from "@/data/site";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Reveal } from "@/components/Reveal";
@@ -182,6 +182,15 @@ export function Annexes() {
                     className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition-all hover:gap-2.5"
                   >
                     <Navigation className="h-4 w-4" /> Itinéraire
+                  </a>
+                  <a
+                    href={a.googleProfileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="ml-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-600 transition-all hover:gap-2.5"
+                  >
+                    <ExternalLink className="h-4 w-4" /> Profil Google
                   </a>
                 </div>
               </Reveal>

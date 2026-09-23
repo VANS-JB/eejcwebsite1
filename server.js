@@ -251,6 +251,7 @@ app.put("/api/admin/announcements", requireAdmin, (req, res) => {
 
 /* ---------- Newsletter (liste de diffusion) ---------- */
 const NEWSLETTER_FILE = path.join(DATA_DIR, "newsletter.json");
+const CONTACT_EMAIL = "arnaudgadji675@gmail.com";
 
 function loadNewsletter() {
   try {
@@ -326,7 +327,7 @@ app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
         disableFileAccess: true,
         disableUrlAccess: true,
         from: process.env.SMTP_FROM || smtpUser,
-        to: process.env.CONTACT_TO || smtpUser,
+        to: CONTACT_EMAIL,
         subject: "Nouvelle inscription à la newsletter",
         text: `${clean} s'est inscrit à la newsletter du site.`,
         html: `<p><strong>${escapeHtml(clean)}</strong> s'est inscrit à la newsletter du site.</p>`,
@@ -471,7 +472,7 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   const smtpFrom = process.env.SMTP_FROM || smtpUser;
-  const contactTo = process.env.CONTACT_TO || "contact@eej-c.org";
+  const contactTo = CONTACT_EMAIL;
 
   if (
     isPlaceholderConfig(smtpHost) ||

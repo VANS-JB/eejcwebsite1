@@ -271,19 +271,22 @@ export type Annex = {
   schedule: string;
   lat: number;
   lng: number;
+  googleProfileUrl: string;
   isHQ?: boolean;
 };
 export const annexes: Annex[] = [
   {
     id: 1,
     name: "Temple Central (Siège)",
-    city: "Cocody-Angré",
+    city: "annexeEEJC",
     address: "Rue des Jardins, Cocody-Angré",
-    pastor: "Apôtre Jean-Marc DIALLO",
-    phone: "+225 27 22 00 00 00",
+    pastor: "Pasteur à EEJ-C",
+    phone: "90107200",
     schedule: "Dim. 09h00 & 17h30",
     lat: 6.164518797036827,
     lng: 1.3268359653440691,
+    googleProfileUrl:
+      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
     isHQ: true,
   },
   {
@@ -291,55 +294,65 @@ export const annexes: Annex[] = [
     name: "Annexe de Yopougon",
     city: "Yopougon",
     address: "Avenue 14, Yopougon Selmer",
-    pastor: "Pasteur Daniel KONÉ",
+    pastor: "Pasteur à EEJ-C",
     phone: "+225 07 11 22 33 44",
     schedule: "Dim. 09h00",
     lat: 5.339,
     lng: -4.083,
+    googleProfileUrl:
+      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
   },
   {
     id: 3,
     name: "Annexe de Treichville",
     city: "Treichville",
     address: "Boulevard Roume, Treichville",
-    pastor: "Pasteure Esther BAO",
+    pastor: "Pasteur à EEJ-C",
     phone: "+225 07 22 33 44 55",
     schedule: "Dim. 09h00",
     lat: 5.296,
     lng: -4.011,
+    googleProfileUrl:
+      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
   },
   {
     id: 4,
     name: "Annexe d'Abobo",
     city: "Abobo",
     address: "Rue des Artisans, Abobo-Baoulé",
-    pastor: "Pasteur Samuel TOURÉ",
+    pastor: "Pasteur à EEJ-C",
     phone: "+225 07 33 44 55 66",
     schedule: "Dim. 09h00",
     lat: 5.424,
     lng: -4.017,
+    googleProfileUrl:
+      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
   },
   {
     id: 5,
     name: "Annexe de Marcory",
     city: "Marcory",
     address: "Rue du Canal, Marcory Zone 4",
-    pastor: "Pasteur Joseph ASSI",
+    pastor: "Pasteur à EEJ-C",
     phone: "+225 07 44 55 66 77",
     schedule: "Dim. 09h00",
     lat: 5.300,
     lng: -4.0085,
+    googleProfileUrl:
+      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
   },
   {
     id: 6,
     name: "Annexe de Port-Bouët",
     city: "Port-Bouët",
     address: "Rond-point Aéroport, Port-Bouët",
-    pastor: "Pasteur Élie COULIBALY",
+    pastor: "Pasteur à EEJ-C",
     phone: "+225 07 55 66 77 88",
     schedule: "Dim. 09h00",
     lat: 5.261,
     lng: -3.993,
+    googleProfileUrl:
+      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
   },
 ];
 
