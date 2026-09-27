@@ -57,8 +57,8 @@ export function About() {
                   </li>
                 ))}
               </ul>
-              <a href="#messages" className={`${btnPrimary} mt-8`}>
-                Lire les enseignements <ArrowRight className="h-4 w-4" />
+              <a href="#direct" className={`${btnPrimary} mt-8`}>
+                Voir les enseignements <ArrowRight className="h-4 w-4" />
               </a>
             </Reveal>
           </div>

@@ -102,7 +102,7 @@ export function Annexes() {
         <SectionHeading
           kicker="Nos annexes"
           title="Une présence près de chez vous"
-          intro="L'Église La Grâce rayonne à travers plusieurs annexes. Cliquez sur une annexe pour la localiser sur la carte et obtenir votre itinéraire."
+          intro="L'EEJ-C rayonne à travers plusieurs annexes. Cliquez sur une annexe pour la localiser sur la carte et obtenir votre itinéraire."
         />
 
         {/* Légende */}

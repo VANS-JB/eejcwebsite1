@@ -11,6 +11,7 @@ export function Footer() {
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [consent, setConsent] = useState(false);
   const year = new Date().getFullYear();
 
   const subscribe = async (e: FormEvent) => {
@@ -128,6 +129,7 @@ export function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Votre email"
                   className="w-full rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-brand-100/60 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  aria-label="Adresse email pour la newsletter"
                 />
                 <label className="flex items-start gap-2 text-xs leading-relaxed text-brand-100/80">
                   <input
@@ -143,7 +145,7 @@ export function Footer() {
                   <span>J'accepte de recevoir les actualités et programmes par email.</span>
                 </label>
                 {error && (
-                  <p className="text-xs font-medium text-red-300">{error}</p>
+                  <p role="alert" className="text-xs font-medium text-red-300">{error}</p>
                 )}
                 <button
                   type="submit"
