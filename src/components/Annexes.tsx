@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { MapPin, User, Clock, Phone, Navigation, Star } from "lucide-react";
+import type { Map as LeafletMap, Marker as LeafletMarker } from "leaflet";
+import { MapPin, User, Clock, Phone, Navigation, Star, ExternalLink } from "lucide-react";
 import { annexes } from "@/data/site";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Reveal } from "@/components/Reveal";
@@ -9,51 +8,75 @@ import { cn } from "@/utils/cn";
 
 export function Annexes() {
   const mapEl = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const markers = useRef<Record<number, L.Marker>>({});
+  const mapRef = useRef<LeafletMap | null>(null);
+  const markers = useRef<Record<number, LeafletMarker>>({});
   const [active, setActive] = useState(annexes[0].id);
 
   useEffect(() => {
     if (!mapEl.current || mapRef.current) return;
+    let disposed = false;
+    let resizeTimer = 0;
+    let resize: (() => void) | undefined;
 
-    const map = L.map(mapEl.current, {
-      scrollWheelZoom: false,
-      zoomControl: true,
-      attributionControl: true,
-    }).setView([5.345, -4.008], 12);
+    const initializeMap = () => {
+      Promise.all([import("leaflet"), import("leaflet/dist/leaflet.css")]).then(
+        ([{ default: L }]) => {
+        if (disposed || !mapEl.current) return;
+        const map = L.map(mapEl.current, {
+          scrollWheelZoom: false,
+          zoomControl: true,
+          attributionControl: true,
+        }).setView([5.345, -4.008], 12);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap",
-      maxZoom: 19,
-    }).addTo(map);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap",
+          maxZoom: 19,
+        }).addTo(map);
 
-    annexes.forEach((a) => {
-      const icon = L.divIcon({
-        className: "",
-        html: `<div class="grace-pin ${a.isHQ ? "is-hq" : ""}"><span>${
-          a.isHQ ? "★" : a.id
-        }</span></div>`,
-        iconSize: [a.isHQ ? 26 : 22, a.isHQ ? 26 : 22],
-        iconAnchor: [a.isHQ ? 13 : 11, a.isHQ ? 26 : 22],
-        popupAnchor: [0, -24],
-      });
-      const marker = L.marker([a.lat, a.lng], { icon }).addTo(map);
-      marker.bindPopup(
-        `<strong style="color:#134e2b">${a.name}</strong><br><span style="font-size:12px;color:#3f4f46">${a.address}</span>`
+        annexes.forEach((a) => {
+          const icon = L.divIcon({
+            className: "",
+            html: `<div class="grace-pin ${a.isHQ ? "is-hq" : ""}"><span>${
+              a.isHQ ? "★" : a.id
+            }</span></div>`,
+            iconSize: [a.isHQ ? 26 : 22, a.isHQ ? 26 : 22],
+            iconAnchor: [a.isHQ ? 13 : 11, a.isHQ ? 26 : 22],
+            popupAnchor: [0, -24],
+          });
+          const marker = L.marker([a.lat, a.lng], { icon }).addTo(map);
+          marker.bindPopup(
+            `<strong style="color:#134e2b">${a.name}</strong><br><span style="font-size:12px;color:#3f4f46">${a.address}</span>`
+          );
+          marker.on("click", () => setActive(a.id));
+          markers.current[a.id] = marker;
+        });
+
+        mapRef.current = map;
+        resize = () => map.invalidateSize();
+        resizeTimer = window.setTimeout(resize, 200);
+        window.addEventListener("resize", resize);
+        const selected = markers.current[annexes[0].id];
+        if (selected) selected.openPopup();
+        }
       );
-      marker.on("click", () => setActive(a.id));
-      markers.current[a.id] = marker;
-    });
+    };
 
-    mapRef.current = map;
-    const resize = () => map.invalidateSize();
-    const t = setTimeout(resize, 200);
-    window.addEventListener("resize", resize);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        initializeMap();
+      },
+      { rootMargin: "300px 0px" }
+    );
+    observer.observe(mapEl.current);
 
     return () => {
-      clearTimeout(t);
-      window.removeEventListener("resize", resize);
-      map.remove();
+      disposed = true;
+      observer.disconnect();
+      window.clearTimeout(resizeTimer);
+      if (resize) window.removeEventListener("resize", resize);
+      mapRef.current?.remove();
       mapRef.current = null;
       markers.current = {};
     };
@@ -68,8 +91,10 @@ export function Annexes() {
     }
   }, [active]);
 
-  const directions = (lat: number, lng: number) =>
-    `https://www.google.com/maps/dir/?api=1&destination=${lat}%2C${lng}`;
+  const directions = (a: (typeof annexes)[number]) => {
+    const destination = a.directionsDestination || `${a.lat},${a.lng}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+  };
 
   return (
     <section id="annexes" className="bg-white py-20 sm:py-28">
@@ -152,13 +177,22 @@ export function Annexes() {
                   </div>
 
                   <a
-                    href={directions(a.lat, a.lng)}
+                    href={directions(a)}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition-all hover:gap-2.5"
                   >
                     <Navigation className="h-4 w-4" /> Itinéraire
+                  </a>
+                  <a
+                    href={a.googleProfileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="ml-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-600 transition-all hover:gap-2.5"
+                  >
+                    <ExternalLink className="h-4 w-4" /> Profil Google
                   </a>
                 </div>
               </Reveal>

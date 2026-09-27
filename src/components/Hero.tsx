@@ -9,9 +9,23 @@ export function Hero() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [loadedSlides, setLoadedSlides] = useState(() => new Set([0]));
 
-  const next = useCallback(() => setI((p) => (p + 1) % slides.length), []);
-  const prev = () => setI((p) => (p - 1 + slides.length) % slides.length);
+  const showSlide = useCallback((index: number) => {
+    setLoadedSlides((current) => {
+      if (current.has(index)) return current;
+      return new Set(current).add(index);
+    });
+    setI(index);
+  }, []);
+  const next = useCallback(() => {
+    setI((current) => {
+      const target = (current + 1) % slides.length;
+      setLoadedSlides((loaded) => new Set(loaded).add(target));
+      return target;
+    });
+  }, []);
+  const prev = () => showSlide((i - 1 + slides.length) % slides.length);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -26,6 +40,24 @@ export function Hero() {
     const t = setInterval(next, 6000);
     return () => clearInterval(t);
   }, [paused, reducedMotion, next]);
+
+  useEffect(() => {
+    const preloadRemaining = () => {
+      slides.slice(1).forEach((slide, offset) => {
+        const image = new Image();
+        image.src = slide.image;
+        image.onload = () => {
+          setLoadedSlides((current) => new Set(current).add(offset + 1));
+        };
+      });
+    };
+    if (document.readyState === "complete") {
+      const timer = window.setTimeout(preloadRemaining, 1500);
+      return () => window.clearTimeout(timer);
+    }
+    window.addEventListener("load", preloadRemaining, { once: true });
+    return () => window.removeEventListener("load", preloadRemaining);
+  }, []);
 
   return (
     <section
@@ -47,8 +79,10 @@ export function Hero() {
           aria-hidden={idx !== i}
         >
           <img
-            src={s.image}
+            src={loadedSlides.has(idx) ? s.image : undefined}
             alt=""
+            fetchPriority={idx === 0 ? "high" : "low"}
+            decoding="async"
             className={cn(
               "h-full w-full object-cover transition-transform duration-[7000ms] ease-out",
               idx === i ? "scale-110" : "scale-100"
@@ -133,7 +167,7 @@ export function Hero() {
         {slides.map((_, idx) => (
           <button
             key={idx}
-            onClick={() => setI(idx)}
+            onClick={() => showSlide(idx)}
             aria-label={`Aller à la diapositive ${idx + 1}`}
             className={cn(
               "h-2 rounded-full transition-all duration-300",

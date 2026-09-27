@@ -40,7 +40,7 @@ export function LiveStream() {
                   Prochain direct
                 </div>
                 <div className="mt-1 font-display text-xl font-bold text-white sm:text-2xl">
-                  Culte de célébration · Dimanche à 09h00
+                  Culte de célébration · Dimanche à 07h00
                 </div>
               </div>
             </div>

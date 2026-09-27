@@ -29,13 +29,14 @@ app.use((_req, res, next) => {
     res.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     res.set(
       "Content-Security-Policy",
-      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.pexels.com https://*.tile.openstreetmap.org; connect-src 'self'; frame-src https://www.google.com https://maps.google.com; upgrade-insecure-requests"
+      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.pexels.com https://*.tile.openstreetmap.org; connect-src 'self'; frame-src https://www.google.com https://maps.google.com https://www.openstreetmap.org; upgrade-insecure-requests"
     );
   }
   next();
 });
 
-const ANNOUNCEMENTS_FILE = path.join(__dirname, "data", "announcements.json");
+const DATA_DIR = path.resolve(__dirname, process.env.DATA_DIR || "data");
+const ANNOUNCEMENTS_FILE = path.join(DATA_DIR, "announcements.json");
 
 /* ============================================================
    Stockage des annonces (fichier JSON édité via l'espace admin)
@@ -171,6 +172,7 @@ const escapeHtml = (value) =>
   })[character]);
 const isPlaceholderConfig = (value) =>
   !value || /votre|changez|exemple|localhost/i.test(value);
+const CONTACT_EMAIL = cleanText(process.env.CONTACT_TO, 254).toLowerCase();
 
 app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: false, limit: "20kb" }));
@@ -249,13 +251,36 @@ app.put("/api/admin/announcements", requireAdmin, (req, res) => {
 });
 
 /* ---------- Newsletter (liste de diffusion) ---------- */
-const NEWSLETTER_FILE = path.join(__dirname, "data", "newsletter.json");
+const NEWSLETTER_FILE = path.join(DATA_DIR, "newsletter.json");
 
 function loadNewsletter() {
   try {
     const raw = fs.readFileSync(NEWSLETTER_FILE, "utf8");
     const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
+    if (!Array.isArray(data)) return [];
+    const unique = new Map();
+    data.forEach((entry) => {
+      const email = cleanText(typeof entry === "string" ? entry : entry?.email, 254).toLowerCase();
+      if (!isEmail(email) || unique.has(email)) return;
+      unique.set(email, {
+        email,
+        subscribedAt:
+          typeof entry === "object" && entry?.subscribedAt
+            ? cleanText(entry.subscribedAt, 40)
+            : new Date().toISOString(),
+        unsubscribeToken:
+          typeof entry === "object" && entry?.unsubscribeToken
+            ? cleanText(entry.unsubscribeToken, 128)
+            : crypto.randomBytes(32).toString("hex"),
+        consentedAt:
+          typeof entry === "object" && entry?.consentedAt
+            ? cleanText(entry.consentedAt, 40)
+            : typeof entry === "object" && entry?.subscribedAt
+              ? cleanText(entry.subscribedAt, 40)
+              : new Date().toISOString(),
+      });
+    });
+    return [...unique.values()];
   } catch {
     return [];
   }
@@ -275,11 +300,17 @@ app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
   }
 
   const list = loadNewsletter();
-  const isNew = !list.includes(clean);
+  const isNew = !list.some((subscriber) => subscriber.email === clean);
   if (isNew) {
-    list.push(clean);
-    saveNewsletter(list);
+    list.push({
+      email: clean,
+      subscribedAt: new Date().toISOString(),
+      consentedAt: new Date().toISOString(),
+      unsubscribeToken: crypto.randomBytes(32).toString("hex"),
+    });
   }
+  // Réécrit aussi les anciennes listes de simples adresses au nouveau format.
+  saveNewsletter(list);
 
   /* Notification par email à l'église (best-effort : l'inscription reste
      enregistrée même si l'envoi échoue) */
@@ -288,6 +319,7 @@ app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
   const smtpPass = process.env.SMTP_PASS;
   if (
     isNew &&
+    isEmail(CONTACT_EMAIL) &&
     !isPlaceholderConfig(smtpHost) &&
     !isPlaceholderConfig(smtpUser) &&
     !isPlaceholderConfig(smtpPass)
@@ -303,7 +335,7 @@ app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
         disableFileAccess: true,
         disableUrlAccess: true,
         from: process.env.SMTP_FROM || smtpUser,
-        to: process.env.CONTACT_TO || smtpUser,
+        to: CONTACT_EMAIL,
         subject: "Nouvelle inscription à la newsletter",
         text: `${clean} s'est inscrit à la newsletter du site.`,
         html: `<p><strong>${escapeHtml(clean)}</strong> s'est inscrit à la newsletter du site.</p>`,
@@ -314,6 +346,119 @@ app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
   }
 
   res.json({ success: true, message: "Inscription enregistrée. Merci !" });
+});
+
+app.get("/api/newsletter/unsubscribe", newsletterLimiter, (req, res) => {
+  const token = cleanText(req.query?.token, 128);
+  const list = loadNewsletter();
+  const index = list.findIndex((subscriber) => safeEqual(subscriber.unsubscribeToken, token));
+  const removed = index >= 0;
+  if (removed) {
+    list.splice(index, 1);
+    saveNewsletter(list);
+  }
+
+  res.status(removed ? 200 : 404).type("html").send(`<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${removed ? "Désinscription confirmée" : "Lien invalide"} | EEJ-C</title></head>
+<body style="margin:0;background:#f6f3ea;font-family:Arial,sans-serif;color:#17231c">
+<main style="min-height:100vh;display:grid;place-items:center;padding:24px">
+<section style="max-width:560px;background:#fff;border-radius:20px;padding:40px;text-align:center;box-shadow:0 12px 40px rgba(8,35,21,.12)">
+<h1 style="color:#176537">${removed ? "Vous êtes désinscrit(e)" : "Lien invalide ou déjà utilisé"}</h1>
+<p>${removed ? "Votre adresse a été retirée de la newsletter de l’EEJ-C." : "Cette adresse n’est plus inscrite ou le lien a expiré."}</p>
+<a href="/" style="display:inline-block;margin-top:18px;color:#176537;font-weight:700">Retour au site</a>
+</section></main></body></html>`);
+});
+
+app.get("/api/admin/newsletter", requireAdmin, (_req, res) => {
+  const subscribers = loadNewsletter();
+  // Assure la migration persistante des anciennes adresses sans exposer les jetons.
+  saveNewsletter(subscribers);
+  res.json({
+    success: true,
+    subscribers: subscribers.map(({ email, subscribedAt }) => ({ email, subscribedAt })),
+  });
+});
+
+app.post("/api/admin/newsletter/send", requireAdmin, async (req, res) => {
+  const subject = cleanText(req.body?.subject, 160).replace(/[\r\n]+/g, " ");
+  const message = cleanText(req.body?.message, 5000);
+  if (!subject || !message) {
+    return res.status(400).json({ success: false, message: "Le sujet et le message sont obligatoires." });
+  }
+
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = Number(process.env.SMTP_PORT || 587);
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpFrom = process.env.SMTP_FROM || smtpUser;
+  if (
+    isPlaceholderConfig(smtpHost) ||
+    isPlaceholderConfig(smtpUser) ||
+    isPlaceholderConfig(smtpPass) ||
+    isPlaceholderConfig(smtpFrom)
+  ) {
+    return res.status(503).json({ success: false, message: "Le service email n'est pas configuré." });
+  }
+
+  const subscribers = loadNewsletter();
+  if (!subscribers.length) {
+    return res.status(400).json({ success: false, message: "Aucun abonné à la newsletter." });
+  }
+  if (subscribers.length > 500) {
+    return res.status(400).json({
+      success: false,
+      message: "La liste dépasse 500 abonnés. Utilisez un service d'envoi spécialisé.",
+    });
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: { user: smtpUser, pass: smtpPass },
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 100,
+  });
+  const configuredUrl = cleanText(process.env.PUBLIC_URL, 300).replace(/\/$/, "");
+  const publicUrl = /^https?:\/\//i.test(configuredUrl)
+    ? configuredUrl
+    : `${req.protocol}://${req.get("host")}`;
+  const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
+
+  const results = await Promise.allSettled(
+    subscribers.map((subscriber) => {
+      const unsubscribeUrl = `${publicUrl}/api/newsletter/unsubscribe?token=${encodeURIComponent(
+        subscriber.unsubscribeToken
+      )}`;
+      return transporter.sendMail({
+        disableFileAccess: true,
+        disableUrlAccess: true,
+        from: smtpFrom,
+        to: subscriber.email,
+        subject,
+        text: `${message}\n\nSe désinscrire : ${unsubscribeUrl}`,
+        html: `<div style="font-family:Arial,sans-serif;line-height:1.65;color:#17231c">
+          <div>${safeMessage}</div>
+          <hr style="margin:32px 0;border:0;border-top:1px solid #dce5df">
+          <p style="font-size:12px;color:#647069">Vous recevez cet email car vous êtes inscrit(e) à la newsletter de l’EEJ-C.<br>
+          <a href="${unsubscribeUrl}">Se désinscrire</a></p>
+        </div>`,
+        headers: { "List-Unsubscribe": `<${unsubscribeUrl}>` },
+      });
+    })
+  );
+  transporter.close();
+  const sent = results.filter((result) => result.status === "fulfilled").length;
+  const failed = results.length - sent;
+  console.log(`Newsletter campaign completed: ${sent} sent, ${failed} failed`);
+  res.status(sent ? 200 : 502).json({
+    success: sent > 0,
+    sent,
+    failed,
+    message: `${sent} email(s) envoyé(s), ${failed} échec(s).`,
+  });
 });
 
 app.post("/api/contact", contactLimiter, async (req, res) => {
@@ -335,13 +480,14 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   const smtpFrom = process.env.SMTP_FROM || smtpUser;
-  const contactTo = process.env.CONTACT_TO || "contact@eej-c.org";
+  const contactTo = CONTACT_EMAIL;
 
   if (
     isPlaceholderConfig(smtpHost) ||
     isPlaceholderConfig(smtpUser) ||
     isPlaceholderConfig(smtpPass) ||
-    isPlaceholderConfig(contactTo)
+    isPlaceholderConfig(contactTo) ||
+    !isEmail(contactTo)
   ) {
     return res.status(503).json({
       success: false,

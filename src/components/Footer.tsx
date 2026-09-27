@@ -7,6 +7,7 @@ import { btnPrimary } from "@/components/ui";
 
 export function Footer() {
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -15,7 +16,10 @@ export function Footer() {
 
   const subscribe = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !consent) {
+      setError("Votre consentement est requis pour vous inscrire.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -127,15 +131,18 @@ export function Footer() {
                   className="w-full rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-brand-100/60 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                   aria-label="Adresse email pour la newsletter"
                 />
-                <label className="flex items-start gap-2 text-xs leading-relaxed text-brand-100">
+                <label className="flex items-start gap-2 text-xs leading-relaxed text-brand-100/80">
                   <input
                     type="checkbox"
                     required
                     checked={consent}
-                    onChange={(event) => setConsent(event.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-brand-500"
+                    onChange={(e) => {
+                      setConsent(e.target.checked);
+                      if (e.target.checked) setError("");
+                    }}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-gold-400"
                   />
-                  J'accepte que mon adresse soit utilisée pour recevoir les annonces de l'EEJ-C.
+                  <span>J'accepte de recevoir les actualités et programmes par email.</span>
                 </label>
                 {error && (
                   <p role="alert" className="text-xs font-medium text-red-300">{error}</p>
