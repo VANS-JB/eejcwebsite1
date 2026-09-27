@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTENU DU SITE — Église Évangélique La Grâce
+  CONTENU DU SITE — Eglise des Envoyés de Jésus-Christ
    ------------------------------------------------------------
    👉 Système de mise à jour simple :
    TOUT le texte, les images, les programmes, les annonces
@@ -28,7 +28,7 @@ export const church = {
     addressShort: "Alaglo, Lomé",
     phone: "+228 90 10 72 00",
     phone2: "+228 07 00 00 00 00",
-    email: "contact@eglise-lagrace.org",
+    email: "arnaudgadji675@gmail.com",
     hours: "Secrétariat : Lun–Ven, 9h00 – 17h00",
   },
   social: {
@@ -192,8 +192,8 @@ export const messages: Message[] = [
 
 export type Schedule = { day: string; title: string; time: string; icon: string };
 export const schedule: Schedule[] = [
-  { day: "Dimanche", title: "Culte de célébration", time: "09h00 & 17h30", icon: "sun" },
-  { day: "Lundi", title: "Etude biblique", time: "17h00", icon: "book" },
+  { day: "Dimanche", title: "Culte de célébration", time: "07h00 & 17h30", icon: "sun" },
+  { day: "Lundi", title: "Etude biblique", time: "17h30", icon: "book" },
   { day: "Mercredi", title: "Culte de délivrance & prière", time: "9h00", icon: "flame" },
   { day: "Vendredi", title: "Veillée de prière", time: "23h00 – 03h00", icon: "moon" },
 ];
@@ -271,20 +271,22 @@ export type Annex = {
   schedule: string;
   lat: number;
   lng: number;
+  directionsDestination?: string;
   googleProfileUrl: string;
   isHQ?: boolean;
 };
 export const annexes: Annex[] = [
   {
     id: 1,
-    name: "Temple Central (Siège)",
+    name: "Canaa Cité des Envoyés (Siège)",
     city: "annexeEEJC",
-    address: "Rue des Jardins, Cocody-Angré",
-    pastor: "Pasteur à EEJ-C",
+    address: "Rue des Lauriers",
+    pastor: "Apôtre Rev. LE BRAVE",
     phone: "90107200",
     schedule: "Dim. 09h00 & 17h30",
     lat: 6.164518797036827,
     lng: 1.3268359653440691,
+    directionsDestination: "Rue des Lauriers, Gbenyedzi Alaglo, Lomé, Togo",
     googleProfileUrl:
       "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
     isHQ: true,

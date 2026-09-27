@@ -91,8 +91,10 @@ export function Annexes() {
     }
   }, [active]);
 
-  const directions = (lat: number, lng: number) =>
-    `https://www.google.com/maps/dir/?api=1&destination=${lat}%2C${lng}`;
+  const directions = (a: (typeof annexes)[number]) => {
+    const destination = a.directionsDestination || `${a.lat},${a.lng}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+  };
 
   return (
     <section id="annexes" className="bg-white py-20 sm:py-28">
@@ -175,7 +177,7 @@ export function Annexes() {
                   </div>
 
                   <a
-                    href={directions(a.lat, a.lng)}
+                    href={directions(a)}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}

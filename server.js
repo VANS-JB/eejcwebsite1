@@ -29,7 +29,7 @@ app.use((_req, res, next) => {
     res.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     res.set(
       "Content-Security-Policy",
-      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.pexels.com https://*.tile.openstreetmap.org; connect-src 'self'; frame-src https://www.google.com https://maps.google.com; upgrade-insecure-requests"
+      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.pexels.com https://*.tile.openstreetmap.org; connect-src 'self'; frame-src https://www.google.com https://maps.google.com https://www.openstreetmap.org; upgrade-insecure-requests"
     );
   }
   next();
@@ -172,6 +172,7 @@ const escapeHtml = (value) =>
   })[character]);
 const isPlaceholderConfig = (value) =>
   !value || /votre|changez|exemple|localhost/i.test(value);
+const CONTACT_EMAIL = cleanText(process.env.CONTACT_TO, 254).toLowerCase();
 
 app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: false, limit: "20kb" }));
@@ -251,7 +252,6 @@ app.put("/api/admin/announcements", requireAdmin, (req, res) => {
 
 /* ---------- Newsletter (liste de diffusion) ---------- */
 const NEWSLETTER_FILE = path.join(DATA_DIR, "newsletter.json");
-const CONTACT_EMAIL = "arnaudgadji675@gmail.com";
 
 function loadNewsletter() {
   try {
@@ -272,6 +272,12 @@ function loadNewsletter() {
           typeof entry === "object" && entry?.unsubscribeToken
             ? cleanText(entry.unsubscribeToken, 128)
             : crypto.randomBytes(32).toString("hex"),
+        consentedAt:
+          typeof entry === "object" && entry?.consentedAt
+            ? cleanText(entry.consentedAt, 40)
+            : typeof entry === "object" && entry?.subscribedAt
+              ? cleanText(entry.subscribedAt, 40)
+              : new Date().toISOString(),
       });
     });
     return [...unique.values()];
@@ -299,6 +305,7 @@ app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
     list.push({
       email: clean,
       subscribedAt: new Date().toISOString(),
+      consentedAt: new Date().toISOString(),
       unsubscribeToken: crypto.randomBytes(32).toString("hex"),
     });
   }
@@ -312,6 +319,7 @@ app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
   const smtpPass = process.env.SMTP_PASS;
   if (
     isNew &&
+    isEmail(CONTACT_EMAIL) &&
     !isPlaceholderConfig(smtpHost) &&
     !isPlaceholderConfig(smtpUser) &&
     !isPlaceholderConfig(smtpPass)
@@ -478,7 +486,8 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
     isPlaceholderConfig(smtpHost) ||
     isPlaceholderConfig(smtpUser) ||
     isPlaceholderConfig(smtpPass) ||
-    isPlaceholderConfig(contactTo)
+    isPlaceholderConfig(contactTo) ||
+    !isEmail(contactTo)
   ) {
     return res.status(503).json({
       success: false,

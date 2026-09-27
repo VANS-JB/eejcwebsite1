@@ -132,6 +132,7 @@ export function Footer() {
                 <label className="flex items-start gap-2 text-xs leading-relaxed text-brand-100/80">
                   <input
                     type="checkbox"
+                    required
                     checked={consent}
                     onChange={(e) => {
                       setConsent(e.target.checked);
