@@ -37,7 +37,7 @@ export function Logo({ variant = "dark", className, mark = 44 }: LogoProps) {
             light ? "text-brand-100" : "text-brand-500"
           )}
         >
-          Eglise des Envoyés de Jésus-Christ
+          Église des Envoyés de Jésus-Christ
         </span>
       </span>
     </span>

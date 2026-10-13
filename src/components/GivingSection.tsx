@@ -26,7 +26,7 @@ export function GivingSection() {
         <Reveal>
           <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-gold-400">
             <span className="h-px w-6 bg-gold-400" />
-              dons
+              Dons
           </span>
           <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-white sm:text-4xl md:text-[2.6rem]">
             Soutenez l'œuvre de Dieu
@@ -65,7 +65,7 @@ export function GivingSection() {
               ))}
             </ul>
             <p className="mt-4 text-xs text-brand-100">
-              Merci d'envoyer votre reçu au secrétariat pour reçu officiel et suivi.
+              Merci d’envoyer votre justificatif de paiement au secrétariat afin d’obtenir un reçu officiel et de faciliter le suivi de votre don.
             </p>
           </div>
         </Reveal>

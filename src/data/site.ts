@@ -1,5 +1,5 @@
 /* ============================================================
-  CONTENU DU SITE — Eglise des Envoyés de Jésus-Christ
+  CONTENU DU SITE — Église des Envoyés de Jésus-Christ
    ------------------------------------------------------------
    👉 Système de mise à jour simple :
    TOUT le texte, les images, les programmes, les annonces
@@ -12,24 +12,29 @@
 export const img = (id: number, w: number, h: number) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${h}`;
 
+export const imgSrcSet = (id: number, width: number, height: number) =>
+  [480, 768, 1280, 1920]
+    .map((size) => `${img(id, size, Math.round((size * height) / width))} ${size}w`)
+    .join(", ");
+
 export const church = {
-  name: "Eglise des Envoyés de Jésus-Christ",
+  name: "Église des Envoyés de Jésus-Christ",
   shortName: "EEJ-C",
   tagline: "Christ en vous, l'espérance de la gloire",
   verseRef: "Colossiens 1:27",
   founded: 2000,
   apostle: {
-    name: "Rev. Apôtre LE BRAVE",
-    role: "Fondateur & Pasteur Principal",
+     name: "Rév. Apôtre LE BRAVE",
+    role: "Fondateur et pasteur principal",
     photo: img(6275777, 900, 1100),
   },
   contact: {
-    address: "Rue des Laurier, Gbenyedzi Alaglo — Lomé, Togo",
+    address: "Rue des Lauriers, Gbenyedzi Alaglo — Lomé, Togo",
     addressShort: "Alaglo, Lomé",
     phone: "+228 90 10 72 00",
     phone2: "+228 07 00 00 00 00",
     email: "arnaudgadji675@gmail.com",
-    hours: "Secrétariat : Lun–Ven, 9h00 – 17h00",
+    hours: "Secrétariat : du lundi au vendredi, de 9 h à 17 h",
   },
   social: {
     facebook: "https://facebook.com",
@@ -52,6 +57,7 @@ export const navItems: NavItem[] = [
 
 export type Slide = {
   image: string;
+  imageSrcSet: string;
   kicker: string;
   title: string;
   text: string;
@@ -59,19 +65,22 @@ export type Slide = {
 export const slides: Slide[] = [
   {
     image: img(36425621, 1920, 1280),
+    imageSrcSet: imgSrcSet(36425621, 1920, 1280),
     kicker: "Bienvenue à EEJ-C",
     title: "Une famille, une foi, une mission",
     text: "Rejoignez une communauté vivante où la Parole de Dieu transforme des vies, restaure les cœurs et édifie des destins.",
   },
   {
     image: img(30550589, 1920, 1280),
-    kicker: "Louange & Adoration",
+    imageSrcSet: imgSrcSet(30550589, 1920, 1280),
+    kicker: "Louange et adoration",
     title: "Élevez la gloire de Dieu",
     text: "Des cultes vibrants, une louange passionnée et la présence puissante de l'Esprit Saint au milieu de nous.",
   },
   {
     image: img(13908967, 1920, 1280),
-    kicker: "Intercession & Prière",
+    imageSrcSet: imgSrcSet(13908967, 1920, 1280),
+    kicker: "Intercession et prière",
     title: "Une maison de prière pour les nations",
     text: "Confiez-nous vos sujets de prière : Dieu exauce et accomplit de grandes choses par la foi.",
   },
@@ -86,19 +95,19 @@ export const heroStats = [
 
 export const about = {
   intro:
-    "L'Église des Envoyés de Jésus Christ est une communauté chrétienne fondée en 2000 sur l'appel d'annoncer la bonne nouvelle à toutes les nations. Née d'un petit groupe de prière à Lomé, elle est aujourd'hui une famille de plus de 12 000 fidèles répartis dans plusieurs annexes.",
+    "L'Église des Envoyés de Jésus-Christ est une communauté chrétienne fondée en 2000 avec pour mission d'annoncer la bonne nouvelle à toutes les nations. Née d'un petit groupe de prière à Lomé, elle est aujourd'hui une famille de plus de 12 000 fidèles répartis dans plusieurs annexes.",
   historyTitle: "Notre histoire",
   history:
     "Tout a commencé dans un modeste salon, autour de l'Apôtre LE BRAVE et de quelques âmes affamées de Dieu. De cette communion naquit une vision claire : annoncer un Christ vivant, sauver les perdus, guérir les blessés et former des disciples. Au fil des années, l'œuvre s'est étendue au-delà des frontières, plantant des annexes au Togo, en Afrique de l'Ouest et auprès de la diaspora.",
   visionTitle: "Notre vision",
   vision:
-    "« Voir toute personne transformée par l'Évangile, équipée pour son appel et envoyée pour impacter sa génération. » Nous croyons en une Église rayonnante, ungido de l'Esprit et engagée dans l'amour du prochain.",
+    "« Voir toute personne transformée par l'Évangile, équipée pour son appel et envoyée pour avoir un impact sur sa génération. » Nous croyons en une Église rayonnante, remplie de l'Esprit et engagée dans l'amour du prochain.",
   missionTitle: "Notre mission",
   mission:
-    "Annoncer la grâce de Dieu, faire de toutes les nations des disciples, intercéder pour les malades et les affligés, et démontrer l'amour de Christ par des actions concrètes envers les plus vulnérables.",
+    "Annoncer la grâce de Dieu, faire de toutes les nations des disciples, intercéder pour les malades et les personnes affligées, et démontrer l'amour du Christ par des actions concrètes en faveur des plus vulnérables.",
   apostleMessageTitle: "Le mot de l'Apôtre",
   apostleMessage:
-    "Bien-aimés, vous êtes chez vous à EEJ-C. Ici, peu importe votre passé : la grâce de Dieu vous accueille telle que vous êtes pour vous transformer en ce que Dieu a prévu. Venez tels que vous êtes, repartez transformés. Que la paix, la joie et la puissance du Saint-Esprit accompagnent chacun de vos pas.",
+    "Bien-aimés, vous êtes chez vous à EEJ-C. Ici, peu importe votre passé : la grâce de Dieu vous accueille comme vous êtes et vous transforme pour vous conduire vers ce que Dieu a prévu pour vous. Venez tels que vous êtes, repartez transformés. Que la paix, la joie et la puissance du Saint-Esprit accompagnent chacun de vos pas.",
 };
 
 export type Value = { icon: string; title: string; text: string };
@@ -184,7 +193,7 @@ export const messages: Message[] = [
     date: "26 janvier 2026",
     duration: "44 min",
     excerpt:
-      "Dieu désire prospérer son peuple pour en faire une bénédiction. Des principes bibliques sur le travail, la gestion et la semence.",
+      "Dieu désire faire prospérer son peuple pour en faire une bénédiction. Découvrez des principes bibliques portant sur le travail, la gestion et la semence.",
     image: img(12044265, 800, 600),
     scripture: "3 Jean 1:2",
   },
@@ -192,10 +201,10 @@ export const messages: Message[] = [
 
 export type Schedule = { day: string; title: string; time: string; icon: string };
 export const schedule: Schedule[] = [
-  { day: "Dimanche", title: "Culte de célébration", time: "07h00 & 17h30", icon: "sun" },
-  { day: "Lundi", title: "Etude biblique", time: "17h30", icon: "book" },
-  { day: "Mercredi", title: "Culte de délivrance & prière", time: "9h00", icon: "flame" },
-  { day: "Vendredi", title: "Veillée de prière", time: "23h00 – 03h00", icon: "moon" },
+  { day: "Dimanche", title: "Culte de célébration", time: "7 h et 17 h 30", icon: "sun" },
+  { day: "Lundi", title: "Étude biblique", time: "17 h 30", icon: "book" },
+  { day: "Mercredi", title: "Culte de délivrance et de prière", time: "9 h", icon: "flame" },
+  { day: "Vendredi", title: "Veillée de prière", time: "23 h – 3 h", icon: "moon" },
 ];
 
 export type Announcement = { date: string; tag: string; title: string; text: string };
@@ -204,19 +213,19 @@ export const announcements: Announcement[] = [
     date: "15–22 juin 2026",
     tag: "Campagne",
     title: "Campagne d'évangélisation « Vague de Gloire »",
-    text: "7 jours de puissance, de miracles et de saluts. Invitez vos proches ! Lieu : Temple central de Cocody.",
+    text: "7 jours de puissance, de miracles et de vies transformées. Invitez vos proches ! Lieu : Temple central de Cocody.",
   },
   {
     date: "12 juillet 2026",
     tag: "Conférence",
-    title: "Congrès international des pasteurs & leaders",
+    title: "Congrès international des pasteurs et des leaders",
     text: "Un rassemblement de leaders venus de plusieurs pays. Inscriptions ouvertes auprès du secrétariat.",
   },
   {
     date: "Dimanche prochain",
     tag: "Baptême",
     title: "Célébration du baptême par immersion",
-    text: "Vous souhaitez obéir au Seigneur par le baptême ? Inscrivez-vous à l'accueil après le culte.",
+    text: "Vous souhaitez obéir au Seigneur par le baptême ? Inscrivez-vous à l’accueil après le culte.",
   },
   {
     date: "En cours",
@@ -247,7 +256,7 @@ export const livePlatforms: LivePlatform[] = [
     name: "YouTube",
     handle: "EEJ-C TV",
     url: church.social.youtube,
-    desc: "Retrouvez nos enseignements en HD et rediffusez les cultes à tout moment.",
+    desc: "Retrouvez nos enseignements en HD et regardez les cultes en rediffusion à tout moment.",
     color: "#FF0000",
     icon: "youtube",
   },
@@ -255,7 +264,7 @@ export const livePlatforms: LivePlatform[] = [
     name: "TikTok Live",
     handle: "@eejc.officiel",
     url: church.social.tiktok,
-    desc: "Des extraits puissants et des lives pour la jeune génération.",
+    desc: "Des extraits inspirants et des diffusions en direct pour la jeune génération.",
     color: "#000000",
     icon: "tiktok",
   },
@@ -272,18 +281,18 @@ export type Annex = {
   lat: number;
   lng: number;
   directionsDestination?: string;
-  googleProfileUrl: string;
+  googleProfileUrl?: string;
   isHQ?: boolean;
 };
 export const annexes: Annex[] = [
   {
     id: 1,
-    name: "Canaa Cité des Envoyés (Siège)",
+    name: "Canaan, Cité des Envoyés (siège)",
     city: "annexeEEJC",
     address: "Rue des Lauriers",
-    pastor: "Apôtre Rev. LE BRAVE",
+    pastor: "Rév. Apôtre KOUDJINO Ayao Raphael",
     phone: "90107200",
-    schedule: "Dim. 09h00 & 17h30",
+    schedule: "Dim. 7 h et 17 h 30",
     lat: 6.164518797036827,
     lng: 1.3268359653440691,
     directionsDestination: "Rue des Lauriers, Gbenyedzi Alaglo, Lomé, Togo",
@@ -292,83 +301,102 @@ export const annexes: Annex[] = [
     isHQ: true,
   },
   {
-    id: 2,
-    name: "Annexe de Yopougon",
-    city: "Yopougon",
-    address: "Avenue 14, Yopougon Selmer",
-    pastor: "Pasteur à EEJ-C",
-    phone: "+225 07 11 22 33 44",
-    schedule: "Dim. 09h00",
-    lat: 5.339,
-    lng: -4.083,
-    googleProfileUrl:
-      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
-  },
-  {
     id: 3,
-    name: "Annexe de Treichville",
-    city: "Treichville",
-    address: "Boulevard Roume, Treichville",
-    pastor: "Pasteur à EEJ-C",
-    phone: "+225 07 22 33 44 55",
-    schedule: "Dim. 09h00",
-    lat: 5.296,
-    lng: -4.011,
-    googleProfileUrl:
-      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
+    name: "EEJ-C, Adétikopé, Camp des Envoyés",
+    city: "Adétikopé",
+    address: "Lomé, Adétikopé",
+    pastor: "Past. AYIH Amegnigan Ghislain",
+    phone: "+228 90 05 07 52",
+    schedule: "Dim. 9 h",
+    lat: 6.3368074,
+    lng: 1.2334895747993468,
+    directionsDestination: "EEJ-C, Adétikopé, Camp des Envoyés, Lomé, Togo",
   },
   {
     id: 4,
-    name: "Annexe d'Abobo",
-    city: "Abobo",
-    address: "Rue des Artisans, Abobo-Baoulé",
-    pastor: "Pasteur à EEJ-C",
-    phone: "+225 07 33 44 55 66",
-    schedule: "Dim. 09h00",
-    lat: 5.424,
-    lng: -4.017,
-    googleProfileUrl:
-      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
+    name: "EEJ-C, Agoè Temple du Calvaire",
+    city: "Agoè Koffi Panou",
+    address: "Agoè Koffi Panou, Kitidjan, Lomé",
+    pastor: "Past. BOSSOU Athanas",
+    phone: "+228 90 23 24 66",
+    schedule: "Dim. 9 h",
+    lat: 6.217409626414917,
+    lng: 1.2207555083287767,
+    directionsDestination: "Église des Envoyés de Jésus-Christ (EEJ-C), Agoè Temple du Calvaire, Agoè Koffi Panou, Kitidjan, Lomé",
   },
   {
     id: 5,
-    name: "Annexe de Marcory",
-    city: "Marcory",
-    address: "Rue du Canal, Marcory Zone 4",
-    pastor: "Pasteur à EEJ-C",
-    phone: "+225 07 44 55 66 77",
-    schedule: "Dim. 09h00",
-    lat: 5.300,
-    lng: -4.0085,
-    googleProfileUrl:
-      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
+    name: "EEJ-C, Kpémé, Temple d’Israël",
+    city: "Kpémé",
+    address: "6G86+6CW, Kpémé",
+    pastor: "Past. EKPE Maurice",
+    phone: "+228 90 22 24 79",
+    schedule: "Dim. 9 h",
+    lat: 6.2156171140890075,
+    lng: 1.5100769744150653,
+    directionsDestination: "Église des Envoyés de Jésus-Christ (EEJ-C), Kpémé, Temple d’Israël, 6G86+6CW, Kpémé",
   },
   {
     id: 6,
-    name: "Annexe de Port-Bouët",
-    city: "Port-Bouët",
-    address: "Rond-point Aéroport, Port-Bouët",
-    pastor: "Pasteur à EEJ-C",
-    phone: "+225 07 55 66 77 88",
-    schedule: "Dim. 09h00",
-    lat: 5.261,
-    lng: -3.993,
-    googleProfileUrl:
-      "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
+    name: "EEJ-C Temple des Disciples",
+    city: "Bè Pa de Souza",
+    address: "46MR+94C Bè Pa de Souza, Rue des Verveines, Lomé",
+    pastor: "Past. AMENOUPOU Robert",
+    phone: "+228 90 07 04 47",
+    schedule: "Dim. 9 h",
+    lat: 6.133427325542622,
+    lng: 1.2398979866195368,
+    directionsDestination: "Église des Envoyés de Jésus-Christ (EEJ-C), Temple des Disciples, 46MR+94C Bè Pa de Souza, Rue des Verveines, Lomé",
+  },
+  {
+    id: 7,
+    name: "EEJ-C Adidogomé, Temple de la Gloire",
+    city: "Adidogomé",
+    address: "646W+8PH, Adidogomé, Lomé",
+    pastor: "Past. DZIDOPE Marcos",
+    phone: "+228 92 48 74 87",
+    schedule: "Dim. 9 h",
+    lat: 6.210826163296158,
+    lng: 1.0747713409938267,
+    directionsDestination: "Église des Envoyés de Jésus-Christ (EEJ-C), Adidogomé, Temple de la Gloire, 646W+8PH, Adidogomé, Lomé",
+  },
+  {
+    id: 8,
+    name: "EEJ-C Temple des Vainqueurs, Aného",
+    city: "Aného",
+    address: "7J56+QG6, Abalokondji, Aného",
+    pastor: "Past. TETOU Yadoko",
+    phone: "+228 97 08 16 40",
+    schedule: "Dim. 9 h",
+    lat: 6.232974914276599,
+    lng: 1.4104330491138848,
+    directionsDestination: "Église des Envoyés de Jésus-Christ (EEJ-C), Temple des Vainqueurs, Aného, 7J56+QG6, Abalokondji",
+  },
+  {
+    id: 2,
+    name: "Adamavo, Temple de la Victoire (EEJ-C)",
+    city: "Baguida",
+    address: "Adamavo, Baguida",
+    pastor: "Past. COMEDJA Agoutie Akouété",
+    phone: "+228 99 59 86 13",
+    schedule: "Dim. 9 h",
+    lat: 6.177395267403738,
+    lng: 1.3130585756070143,
+    directionsDestination: "Adamavo, Temple de la Victoire (EEJ-C), Adamavo, Baguida",
   },
 ];
 
 export const faqs = [
   {
     q: "À quelle heure ont lieu les cultes ?",
-    a: "Le culte principal de célébration a lieu le dimanche à 09h00 et 11h30 au Temple central. Les annexes célèbrent le dimanche à 09h00.",
+    a: "Le culte principal de célébration a lieu le dimanche à 7 h et à 11 h 30 au Temple central. Les annexes célèbrent le dimanche à 9 h.",
   },
   {
     q: "Comment puis-je devenir membre ?",
-    a: "Rendez-vous à l'accueil après un culte ou écrivez-nous via le formulaire de contact. Un parcours d'intégration vous accueillera.",
+    a: "Rendez-vous à l’accueil après un culte ou écrivez-nous via le formulaire de contact. Nous vous accompagnerons dans votre parcours d’intégration.",
   },
   {
     q: "Proposez-vous un accompagnement spirituel ?",
-    a: "Oui. Nos pasteurs et conseillers sont disponibles pour la prière, le conseil et l'accompagnement. Contactez le secrétariat.",
+    a: "Oui. Nos pasteurs et conseillers sont disponibles pour la prière, le conseil et l’accompagnement. Contactez le secrétariat.",
   },
 ];

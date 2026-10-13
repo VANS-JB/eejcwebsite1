@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import compression from "compression";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const port = Number(process.env.PORT || 3002);
 const isProduction = process.env.NODE_ENV === "production";
 
 app.disable("x-powered-by");
+app.use(compression());
 
 app.use((_req, res, next) => {
   res.set({
@@ -46,7 +48,7 @@ const defaultAnnouncements = [
     date: "Dimanche prochain",
     tag: "Baptême",
     title: "Célébration du baptême par immersion",
-    text: "Vous souhaitez obéir au Seigneur par le baptême ? Inscrivez-vous à l'accueil après le culte.",
+    text: "Vous souhaitez obéir au Seigneur par le baptême ? Inscrivez-vous à l’accueil après le culte.",
   },
 ];
 
@@ -293,7 +295,7 @@ function saveNewsletter(list) {
 app.post("/api/newsletter", newsletterLimiter, async (req, res) => {
   const clean = cleanText(req.body?.email, 254).toLowerCase();
   if (!isEmail(clean)) {
-    return res.status(400).json({ success: false, message: "Adresse email invalide." });
+    return res.status(400).json({ success: false, message: "Adresse e-mail invalide." });
   }
   if (req.body?.consent !== true) {
     return res.status(400).json({ success: false, message: "Votre consentement est requis." });
@@ -398,7 +400,7 @@ app.post("/api/admin/newsletter/send", requireAdmin, async (req, res) => {
     isPlaceholderConfig(smtpPass) ||
     isPlaceholderConfig(smtpFrom)
   ) {
-    return res.status(503).json({ success: false, message: "Le service email n'est pas configuré." });
+    return res.status(503).json({ success: false, message: "Le service d’envoi d’e-mails n’est pas configuré." });
   }
 
   const subscribers = loadNewsletter();
@@ -442,7 +444,7 @@ app.post("/api/admin/newsletter/send", requireAdmin, async (req, res) => {
         html: `<div style="font-family:Arial,sans-serif;line-height:1.65;color:#17231c">
           <div>${safeMessage}</div>
           <hr style="margin:32px 0;border:0;border-top:1px solid #dce5df">
-          <p style="font-size:12px;color:#647069">Vous recevez cet email car vous êtes inscrit(e) à la newsletter de l’EEJ-C.<br>
+          <p style="font-size:12px;color:#647069">Vous recevez ce message, car votre adresse est inscrite à la newsletter de l’EEJ-C.<br>
           <a href="${unsubscribeUrl}">Se désinscrire</a></p>
         </div>`,
         headers: { "List-Unsubscribe": `<${unsubscribeUrl}>` },
@@ -457,7 +459,7 @@ app.post("/api/admin/newsletter/send", requireAdmin, async (req, res) => {
     success: sent > 0,
     sent,
     failed,
-    message: `${sent} email(s) envoyé(s), ${failed} échec(s).`,
+    message: `${sent} ${sent === 1 ? "e-mail envoyé" : "e-mails envoyés"}, ${failed} ${failed === 1 ? "échec" : "échecs"}.`,
   });
 });
 

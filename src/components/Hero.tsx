@@ -41,24 +41,6 @@ export function Hero() {
     return () => clearInterval(t);
   }, [paused, reducedMotion, next]);
 
-  useEffect(() => {
-    const preloadRemaining = () => {
-      slides.slice(1).forEach((slide, offset) => {
-        const image = new Image();
-        image.src = slide.image;
-        image.onload = () => {
-          setLoadedSlides((current) => new Set(current).add(offset + 1));
-        };
-      });
-    };
-    if (document.readyState === "complete") {
-      const timer = window.setTimeout(preloadRemaining, 1500);
-      return () => window.clearTimeout(timer);
-    }
-    window.addEventListener("load", preloadRemaining, { once: true });
-    return () => window.removeEventListener("load", preloadRemaining);
-  }, []);
-
   return (
     <section
       id="accueil"
@@ -80,6 +62,8 @@ export function Hero() {
         >
           <img
             src={loadedSlides.has(idx) ? s.image : undefined}
+            srcSet={loadedSlides.has(idx) ? s.imageSrcSet : undefined}
+            sizes="100vw"
             alt=""
             fetchPriority={idx === 0 ? "high" : "low"}
             decoding="async"
