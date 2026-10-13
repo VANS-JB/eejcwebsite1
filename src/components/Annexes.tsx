@@ -26,7 +26,7 @@ export function Annexes() {
           scrollWheelZoom: false,
           zoomControl: true,
           attributionControl: true,
-        }).setView([5.345, -4.008], 12);
+        }).setView([6.22, 1.30], 10);
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: "&copy; OpenStreetMap",
@@ -102,7 +102,7 @@ export function Annexes() {
         <SectionHeading
           kicker="Nos annexes"
           title="Une présence près de chez vous"
-          intro="L'EEJ-C rayonne à travers plusieurs annexes. Cliquez sur une annexe pour la localiser sur la carte et obtenir votre itinéraire."
+          intro="L’Église des Envoyées de Jésus-Christ est présente à travers plusieurs annexes. Sélectionnez une annexe pour la localiser sur la carte et obtenir un itinéraire."
         />
 
         {/* Légende */}
@@ -185,15 +185,17 @@ export function Annexes() {
                   >
                     <Navigation className="h-4 w-4" /> Itinéraire
                   </a>
-                  <a
-                    href={a.googleProfileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="ml-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-600 transition-all hover:gap-2.5"
-                  >
-                    <ExternalLink className="h-4 w-4" /> Profil Google
-                  </a>
+                  {a.googleProfileUrl && (
+                    <a
+                      href={a.googleProfileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="ml-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-600 transition-all hover:gap-2.5"
+                    >
+                      <ExternalLink className="h-4 w-4" /> Profil Google
+                    </a>
+                  )}
                 </div>
               </Reveal>
             ))}

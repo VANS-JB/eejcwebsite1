@@ -11,7 +11,6 @@ export function Footer() {
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [consent, setConsent] = useState(false);
   const year = new Date().getFullYear();
 
   const subscribe = async (e: FormEvent) => {
@@ -29,10 +28,10 @@ export function Footer() {
         body: JSON.stringify({ email, consent }),
       });
       const d = await r.json();
-      if (!r.ok) throw new Error(d.message || "Échec de l'inscription.");
+      if (!r.ok) throw new Error(d.message || "Échec de l’inscription.");
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Échec de l'inscription.");
+      setError(err instanceof Error ? err.message : "Échec de l’inscription.");
     } finally {
       setBusy(false);
     }
@@ -115,10 +114,10 @@ export function Footer() {
           {/* Newsletter */}
           <div className="lg:col-span-2">
             <h4 className="text-sm font-bold uppercase tracking-wider text-white">Newsletter</h4>
-            <p className="mt-4 text-sm">Annonces & programmes chaque semaine.</p>
+            <p className="mt-4 text-sm">Recevez chaque semaine les annonces et les programmes.</p>
             {done ? (
               <p className="mt-4 rounded-xl bg-white/10 px-4 py-3 text-sm text-gold-400">
-                ✓ Merci ! Vous êtes bien inscrit.
+                ✓ Merci ! Votre inscription est confirmée.
               </p>
             ) : (
               <form onSubmit={subscribe} className="mt-4 flex flex-col gap-2">
@@ -127,7 +126,7 @@ export function Footer() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Votre email"
+                  placeholder="Votre adresse e-mail"
                   className="w-full rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-brand-100/60 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                   aria-label="Adresse email pour la newsletter"
                 />
@@ -142,7 +141,7 @@ export function Footer() {
                     }}
                     className="mt-0.5 h-4 w-4 shrink-0 accent-gold-400"
                   />
-                  <span>J'accepte de recevoir les actualités et programmes par email.</span>
+                  <span>J’accepte de recevoir les actualités et les programmes par e-mail.</span>
                 </label>
                 {error && (
                   <p role="alert" className="text-xs font-medium text-red-300">{error}</p>
@@ -152,7 +151,7 @@ export function Footer() {
                   disabled={busy}
                   className={`${btnPrimary} justify-center disabled:cursor-not-allowed disabled:opacity-50`}
                 >
-                  <Send className="h-4 w-4" /> {busy ? "Inscription…" : "S'abonner"}
+                  <Send className="h-4 w-4" /> {busy ? "Inscription…" : "S’abonner"}
                 </button>
               </form>
             )}
@@ -171,7 +170,7 @@ export function Footer() {
             href="/admin"
             className="italic opacity-50 transition-opacity hover:opacity-100"
           >
-            Espace admin
+            Espace d’administration
           </a>
         </div>
       </div>

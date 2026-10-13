@@ -20,7 +20,7 @@ export function Programs() {
       <div className="container-x">
         <SectionHeading
           kicker="Vie de l'Église"
-          title="Programmes & annonces"
+          title="Programmes et annonces"
           intro="Retrouvez le calendrier hebdomadaire des activités et restez informé des actualités, événements et rassemblements à venir."
         />
 
@@ -65,7 +65,7 @@ export function Programs() {
               <div className="flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-xl font-bold text-ink">
                   <Megaphone className="h-5 w-5 text-accent-500" />
-                  Annonces &amp; actualités
+                  Annonces et actualités
                 </h3>
                 <span className="hidden rounded-full bg-accent-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-accent-600 sm:inline-block">
                   {announcements.length} à la une

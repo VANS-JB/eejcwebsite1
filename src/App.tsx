@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { MarqueeBar } from "@/components/MarqueeBar";
 import { Hero } from "@/components/Hero";
@@ -9,14 +10,21 @@ import { GivingSection } from "@/components/GivingSection";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
-import { AdminPage } from "@/components/admin/AdminPage";
+
+const AdminPage = lazy(() => import("@/components/admin/AdminPage").then((module) => ({ default: module.AdminPage })));
 
 const isAdminRoute =
   window.location.pathname.startsWith("/admin") ||
   window.location.hash.startsWith("#/admin");
 
 export default function App() {
-  if (isAdminRoute) return <AdminPage />;
+  if (isAdminRoute) {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-cream" />}>
+        <AdminPage />
+      </Suspense>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

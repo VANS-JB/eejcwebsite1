@@ -145,7 +145,8 @@ export function AdminPage() {
   const sendCampaign = async (event: FormEvent) => {
     event.preventDefault();
     if (!campaign.subject.trim() || !campaign.message.trim()) return;
-    if (!confirm(`Envoyer cette newsletter à ${subscribers.length} abonné(s) ?`)) return;
+    const subscriberLabel = subscribers.length === 1 ? "abonné" : "abonnés";
+    if (!confirm(`Envoyer cette newsletter à ${subscribers.length} ${subscriberLabel} ?`)) return;
     setCampaignBusy(true);
     setCampaignNotice("");
     setError("");
@@ -178,7 +179,7 @@ export function AdminPage() {
             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
               <Lock className="h-6 w-6" />
             </span>
-            <h1 className="mt-4 text-2xl font-bold text-ink">Espace admin</h1>
+            <h1 className="mt-4 text-2xl font-bold text-ink">Espace d’administration</h1>
             <p className="mt-1 text-sm text-body">
               Gérez les annonces affichées sur le site.
             </p>
@@ -220,7 +221,7 @@ export function AdminPage() {
         <div className="container-x flex items-center justify-between gap-4 py-4">
           <div className="flex items-center gap-3">
             <Logo variant="light" />
-            <span className="hidden text-sm text-brand-100 sm:inline">Espace admin</span>
+            <span className="hidden text-sm text-brand-100 sm:inline">Espace d’administration</span>
           </div>
           <div className="flex items-center gap-2">
             <a
@@ -413,7 +414,7 @@ export function AdminPage() {
             <form onSubmit={sendCampaign} className="space-y-4 lg:col-span-3">
               <div>
                 <label htmlFor="campaign-subject" className="mb-1.5 block text-sm font-semibold text-ink">
-                  Sujet de l'email
+                  Sujet de l’e-mail
                 </label>
                 <input
                   id="campaign-subject"
@@ -446,7 +447,7 @@ export function AdminPage() {
                 className={`${btnPrimary} disabled:cursor-not-allowed disabled:opacity-40`}
               >
                 <Send className="h-4 w-4" />
-                {campaignBusy ? "Envoi en cours…" : `Envoyer à ${subscribers.length} abonné(s)`}
+                {campaignBusy ? "Envoi en cours…" : `Envoyer à ${subscribers.length} ${subscribers.length === 1 ? "abonné" : "abonnés"}`}
               </button>
               {campaignNotice && (
                 <p role="status" className="text-sm font-semibold text-green-600">{campaignNotice}</p>
@@ -462,7 +463,7 @@ export function AdminPage() {
                       <li key={subscriber.email} className="px-4 py-3">
                         <div className="break-all text-sm font-medium text-ink">{subscriber.email}</div>
                         <div className="mt-0.5 text-xs text-body">
-                          Inscrit le {new Date(subscriber.subscribedAt).toLocaleDateString("fr-FR")}
+                          Date d’inscription : {new Date(subscriber.subscribedAt).toLocaleDateString("fr-FR")}
                         </div>
                       </li>
                     ))}
@@ -472,7 +473,7 @@ export function AdminPage() {
                 )}
               </div>
               <p className="mt-3 text-xs leading-relaxed text-body">
-                Chaque email contient automatiquement un lien personnel de désinscription.
+                Chaque e-mail contient automatiquement un lien personnel de désinscription.
               </p>
             </div>
           </div>
