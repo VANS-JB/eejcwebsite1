@@ -46,9 +46,9 @@ export function Contact() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.name.trim()) e.name = "Veuillez indiquer votre nom.";
-    if (!form.email.trim()) e.email = "Veuillez indiquer votre email.";
+    if (!form.email.trim()) e.email = "Veuillez indiquer votre adresse e-mail.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      e.email = "Adresse email invalide.";
+      e.email = "Adresse e-mail invalide.";
     if (!form.message.trim()) e.message = "Veuillez écrire votre message.";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -72,7 +72,7 @@ export function Contact() {
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim(),
-          subject: form.subject.trim() || "Demande via le site",
+          subject: form.subject.trim() || "Demande envoyée depuis le site",
           message: form.message.trim(),
         }),
       });
@@ -80,7 +80,7 @@ export function Contact() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || "Le message n'a pas pu être envoyé. Veuillez réessayer plus tard.");
+        throw new Error(data.message || "Le message n’a pas pu être envoyé. Veuillez réessayer plus tard.");
       }
 
       setSubmittedName(form.name.trim());
@@ -89,7 +89,7 @@ export function Contact() {
       setErrors({});
     } catch (error) {
       setSubmitError(
-        error instanceof Error ? error.message : "Une erreur est survenue lors de l'envoi du message."
+        error instanceof Error ? error.message : "Une erreur est survenue lors de l’envoi du message."
       );
     } finally {
       setIsSubmitting(false);
@@ -106,7 +106,7 @@ export function Contact() {
     },
     {
       icon: Mail,
-      label: "Email",
+      label: "E-mail",
       value: church.contact.email,
       href: `mailto:${church.contact.email}`,
     },
@@ -119,7 +119,7 @@ export function Contact() {
         <SectionHeading
           kicker="Contact"
           title="Restons connectés"
-          intro="Une question, un sujet de prière ou l'envie de nous rejoindre ? Écrivez-nous : notre équipe vous répondra avec joie."
+          intro="Une question, un sujet de prière ou l’envie de nous rejoindre ? Écrivez-nous : notre équipe vous répondra avec joie."
         />
 
         <div className="mt-14 grid gap-8 lg:grid-cols-5">
@@ -160,14 +160,6 @@ export function Contact() {
               })}
             </div>
 
-            <div className="mt-4 overflow-hidden rounded-2xl border border-line shadow-sm">
-              <iframe
-                title="Localisation du Temple central"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=-4.02%2C5.37%2C-3.95%2C5.40&layer=mapnik&marker=5.388%2C-3.989"
-                className="h-48 w-full border-0"
-                loading="lazy"
-              />
-            </div>
           </Reveal>
 
           {/* Formulaire */}
@@ -180,7 +172,7 @@ export function Contact() {
                   </span>
                   <h3 className="mt-5 text-2xl font-bold text-ink">Message envoyé !</h3>
                   <p className="mt-2 max-w-sm text-body">
-                    Merci {submittedName.split(" ")[0] || "cher ami"}. Votre message a bien été reçu.
+                    Merci, {submittedName.split(" ")[0]} ! Votre message a bien été reçu.
                     Notre équipe vous répondra dans les meilleurs délais. Que Dieu vous bénisse.
                   </p>
                   <button
@@ -215,7 +207,7 @@ export function Contact() {
                     </div>
                     <div>
                       <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-ink">
-                        Email *
+                        E-mail *
                       </label>
                       <input
                         id="email"
@@ -240,7 +232,7 @@ export function Contact() {
                         autoComplete="tel"
                         value={form.phone}
                         onChange={(e) => set("phone", e.target.value)}
-                        placeholder="+228 ..."
+                        placeholder="+228 …"
                         className={cn(inputBase, "border-line focus:ring-brand-200")}
                       />
                     </div>
@@ -254,7 +246,7 @@ export function Contact() {
                         onChange={(e) => set("subject", e.target.value)}
                         className={cn(inputBase, "border-line focus:ring-brand-200")}
                       >
-                        <option value="">Choisir...</option>
+                        <option value="">Choisir…</option>
                         {subjects.map((s) => (
                           <option key={s} value={s}>
                             {s}
@@ -274,7 +266,7 @@ export function Contact() {
                       maxLength={5000}
                       value={form.message}
                       onChange={(e) => set("message", e.target.value)}
-                      placeholder="Écrivez votre message ici..."
+                      placeholder="Écrivez votre message ici…"
                       className={cn(inputBase, "resize-none", errors.message ? "border-accent-500 focus:ring-accent-200" : "border-line focus:ring-brand-200")}
                     />
                     {errors.message && <p className="mt-1 text-xs text-accent-600">{errors.message}</p>}
@@ -285,7 +277,7 @@ export function Contact() {
                     disabled={isSubmitting}
                     className={cn(btnPrimary, "mt-6 w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-70")}
                   >
-                    <Send className="h-4 w-4" /> {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
+                    <Send className="h-4 w-4" /> {isSubmitting ? "Envoi en cours…" : "Envoyer le message"}
                   </button>
                   {submitError && <p role="alert" className="mt-3 text-sm text-accent-600">{submitError}</p>}
                   <p className="mt-3 text-xs text-body">

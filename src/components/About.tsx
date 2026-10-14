@@ -35,14 +35,6 @@ export function About() {
                 />
                 <div className="absolute inset-0 bg-brand-900/10" />
               </div>
-              <div className="absolute -bottom-6 -right-4 hidden w-44 overflow-hidden rounded-2xl border-4 border-white shadow-lg sm:block">
-                <img
-                  src={img(6663862, 400, 300)}
-                  alt="Moment de prière"
-                  className="h-28 w-full object-cover"
-                  loading="lazy"
-                />
-              </div>
               <div className="absolute -left-4 -top-4 rounded-2xl bg-brand-500 px-5 py-4 text-white shadow-lg">
                 <div className="font-display text-3xl font-extrabold leading-none">2000</div>
                 <div className="mt-1 text-[0.65rem] font-semibold uppercase tracking-wider text-brand-100">
