@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run server\" \"vite\"",
     "server": "node server.js",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/ssr.tsx --outDir dist-ssr && node scripts/prerender.js",
     "start": "node server.js",
     "preview": "vite preview"
   },

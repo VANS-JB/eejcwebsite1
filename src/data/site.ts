@@ -29,8 +29,8 @@ export const church = {
     photo: img(6275777, 900, 1100),
   },
   contact: {
-    address: "Rue des Lauriers, Gbenyedzi Alaglo — Lomé, Togo",
-    addressShort: "Alaglo, Lomé",
+    address: "47V5+P9R, Rue des Lauriers — Lomé, Togo",
+    addressShort: "Rue des Lauriers, Lomé",
     phone: "+228 90 10 72 00",
     phone2: "+228 07 00 00 00 00",
     email: "arnaudgadji675@gmail.com",
@@ -38,21 +38,22 @@ export const church = {
   },
   social: {
     facebook: "https://facebook.com",
-    youtube: "https://youtube.com",
-    tiktok: "https://tiktok.com",
+    youtube: "https://www.youtube.com/@EglisedesEnvoy%C3%A9sdeJ%C3%A9sus-Christ",
+    tiktok: "www.tiktok.com/@eejc.canaan",
     instagram: "https://instagram.com",
   },
 };
 
 export type NavItem = { label: string; href: string };
 export const navItems: NavItem[] = [
-  { label: "Accueil", href: "#accueil" },
-  { label: "À propos", href: "#apropos" },
+  { label: "Accueil", href: "/" },
+  { label: "À propos", href: "/#apropos" },
   // { label: "Messages", href: "#messages" },
-  { label: "Programmes", href: "#programmes" },
-  { label: "En direct", href: "#direct" },
-  { label: "Annexes", href: "#annexes" },
-  { label: "Contact", href: "#contact" },
+  { label: "Programmes", href: "/programmes" },
+  { label: "En direct", href: "/#direct" },
+  { label: "Annexes", href: "/annexes" },
+  { label: "Messages", href: "/messages" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export type Slide = {
@@ -289,13 +290,13 @@ export const annexes: Annex[] = [
     id: 1,
     name: "Canaan, Cité des Envoyés (siège)",
     city: "annexeEEJC",
-    address: "Rue des Lauriers",
+    address: "47V5+P9R, Rue des Lauriers",
     pastor: "Rév. Apôtre KOUDJINO Ayao Raphael",
     phone: "90107200",
     schedule: "Dim. 7 h et 17 h 30",
-    lat: 6.164518797036827,
-    lng: 1.3268359653440691,
-    directionsDestination: "Rue des Lauriers, Gbenyedzi Alaglo, Lomé, Togo",
+    lat: 6.1443713,
+    lng: 1.2583842,
+    directionsDestination: "47V5+P9R, Rue des Lauriers, Lomé, Togo",
     googleProfileUrl:
       "https://business.google.com/n/229278163236567155/profile?fid=14629878135772036486",
     isHQ: true,
@@ -389,7 +390,7 @@ export const annexes: Annex[] = [
 export const faqs = [
   {
     q: "À quelle heure ont lieu les cultes ?",
-    a: "Le culte principal de célébration a lieu le dimanche à 7 h et à 11 h 30 au Temple central. Les annexes célèbrent le dimanche à 9 h.",
+    a: "Au Temple central : culte de célébration le dimanche à 7 h et 17 h 30, étude biblique le lundi à 17 h 30, culte de délivrance et de prière le mercredi à 9 h, et veillée de prière le vendredi de 23 h à 3 h. Les annexes célèbrent le dimanche à 9 h.",
   },
   {
     q: "Comment puis-je devenir membre ?",

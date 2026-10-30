@@ -75,7 +75,7 @@ export function Footer() {
                 </li>
               ))}
               <li>
-                <a href="#don" className="font-semibold text-gold-400 transition-colors hover:text-gold-500">
+                <a href="/#don" className="font-semibold text-gold-400 transition-colors hover:text-gold-500">
                   Faire un don
                 </a>
               </li>

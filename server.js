@@ -39,6 +39,22 @@ app.use((_req, res, next) => {
 
 const DATA_DIR = path.resolve(__dirname, process.env.DATA_DIR || "data");
 const ANNOUNCEMENTS_FILE = path.join(DATA_DIR, "announcements.json");
+const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+
+const sermonDays = new Set(["Lundi", "Mercredi", "Vendredi", "Dimanche"]);
+
+function loadMessages() {
+  try {
+    const data = JSON.parse(fs.readFileSync(MESSAGES_FILE, "utf8"));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMessages(messages) {
+  writeJsonAtomic(MESSAGES_FILE, messages);
+}
 
 /* ============================================================
    Stockage des annonces (fichier JSON édité via l'espace admin)
@@ -193,6 +209,16 @@ app.get("/api/announcements", (_req, res) => {
   res.json({ success: true, announcements: loadAnnouncements() });
 });
 
+app.get("/api/messages", (_req, res) => {
+  res.json({ success: true, messages: loadMessages() });
+});
+
+app.get("/api/messages/:slug", (req, res) => {
+  const message = loadMessages().find((entry) => entry.slug === req.params.slug);
+  if (!message) return res.status(404).json({ success: false, message: "Message introuvable." });
+  res.json({ success: true, message });
+});
+
 /* ---------- Espace admin ---------- */
 app.post("/api/admin/login", loginLimiter, (req, res) => {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -250,6 +276,50 @@ app.put("/api/admin/announcements", requireAdmin, (req, res) => {
 
   saveAnnouncements(clean);
   res.json({ success: true, announcements: clean });
+});
+
+app.get("/api/admin/messages", requireAdmin, (_req, res) => {
+  res.json({ success: true, messages: loadMessages() });
+});
+
+app.put("/api/admin/messages", requireAdmin, (req, res) => {
+  const { messages } = req.body || {};
+  if (!Array.isArray(messages) || messages.length > 500) {
+    return res.status(400).json({ success: false, message: "La liste de messages est invalide (maximum 500)." });
+  }
+
+  const clean = [];
+  const slugs = new Set();
+  for (const entry of messages) {
+    const sermon = {
+      slug: cleanText(entry?.slug, 100).toLowerCase(),
+      date: cleanText(entry?.date, 10),
+      day: cleanText(entry?.day, 20),
+      title: cleanText(entry?.title, 160),
+      preacher: cleanText(entry?.preacher, 120),
+      scripture: cleanText(entry?.scripture, 120),
+      excerpt: cleanText(entry?.excerpt, 3000),
+      videoUrl: cleanText(entry?.videoUrl, 1000),
+      audioUrl: cleanText(entry?.audioUrl, 1000),
+    };
+    const validDate = /^\d{4}-\d{2}-\d{2}$/.test(sermon.date) && !Number.isNaN(Date.parse(`${sermon.date}T00:00:00Z`));
+    const validSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(sermon.slug);
+    const validMediaUrl = (value) => !value || /^https:\/\//i.test(value);
+    if (
+      !validSlug || slugs.has(sermon.slug) || !validDate || !sermonDays.has(sermon.day) ||
+      !sermon.title || !sermon.preacher || !sermon.excerpt ||
+      (!sermon.videoUrl && !sermon.audioUrl) ||
+      !validMediaUrl(sermon.videoUrl) || !validMediaUrl(sermon.audioUrl)
+    ) {
+      return res.status(400).json({ success: false, message: "Vérifiez les champs, les liens HTTPS et l’unicité des adresses de message." });
+    }
+    slugs.add(sermon.slug);
+    clean.push(sermon);
+  }
+
+  clean.sort((a, b) => b.date.localeCompare(a.date));
+  saveMessages(clean);
+  res.json({ success: true, messages: clean });
 });
 
 /* ---------- Newsletter (liste de diffusion) ---------- */
@@ -541,6 +611,27 @@ app.use("/api", (_req, res) => {
   res.status(404).json({ success: false, message: "Route API introuvable." });
 });
 
+app.get("/sitemap.xml", (_req, res) => {
+  const routes = ["/", "/annexes", "/programmes", "/messages", ...loadMessages().map((message) => `/messages/${message.slug}`)];
+  const urls = routes.map((route) => `  <url><loc>https://www.eej-c.org${route === "/" ? "/" : route}</loc></url>`).join("\n");
+  res.type("application/xml").send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+});
+
+app.get("*", async (req, res, next) => {
+  if (path.extname(req.path)) return next();
+  try {
+    const [{ renderPage }, template] = await Promise.all([
+      import(new URL("./dist-ssr/ssr.js", import.meta.url)),
+      fs.promises.readFile(path.join(__dirname, "dist-ssr", "template.html"), "utf8"),
+    ]);
+    const messages = loadMessages();
+    const isMissingMessage = req.path.startsWith("/messages/") && !messages.some((entry) => entry.slug === req.path.slice("/messages/".length));
+    res.status(isMissingMessage ? 404 : 200).type("html").send(renderPage(template, req.path, messages));
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use((error, _req, res, next) => {
   if (error instanceof SyntaxError || error?.type === "entity.too.large") {
     return res.status(400).json({ success: false, message: "Requête invalide ou trop volumineuse." });
@@ -549,10 +640,6 @@ app.use((error, _req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, "dist")));
-
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
 
 app.listen(port, () => {
   console.log(`Backend listening on http://localhost:${port}`);
