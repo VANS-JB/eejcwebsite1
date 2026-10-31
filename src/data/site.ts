@@ -33,13 +33,13 @@ export const church = {
     addressShort: "Rue des Lauriers, Lomé",
     phone: "+228 90 10 72 00",
     phone2: "+228 07 00 00 00 00",
-    email: "arnaudgadji675@gmail.com",
+    email: "eejc2026@gmail.com",
     hours: "Secrétariat : du lundi au vendredi, de 9 h à 17 h",
   },
   social: {
     facebook: "https://facebook.com",
     youtube: "https://www.youtube.com/@EglisedesEnvoy%C3%A9sdeJ%C3%A9sus-Christ",
-    tiktok: "www.tiktok.com/@eejc.canaan",
+    tiktok: "https://www.tiktok.com/@eejc.canaan",
     instagram: "https://instagram.com",
   },
 };
