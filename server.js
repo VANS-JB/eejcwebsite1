@@ -14,10 +14,24 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = Number(process.env.PORT || 3002);
-const isProduction = process.env.NODE_ENV === "production";
+/* Sécurité par défaut : on se considère en production sauf si l'on est
+   explicitement en développement. Auparavant, lancer `npm start` sans définir
+   NODE_ENV désactivait silencieusement HSTS et la Content-Security-Policy. */
+const isProduction = process.env.NODE_ENV !== "development";
 
 app.disable("x-powered-by");
 app.use(compression());
+
+/* Derrière un reverse proxy (nginx, Caddy, hébergeur), l'IP réelle du client
+   arrive dans l'en-tête X-Forwarded-For. Sans ce réglage, toutes les requêtes
+   portent l'IP du proxy : le rate-limiting s'applique alors globalement (un
+   seul visiteur peut bloquer le site pour tout le monde) et ne protège plus
+   réellement le formulaire ni la connexion admin.
+   TRUST_PROXY=1 si un proxy est devant le serveur, 0 (défaut) sinon. */
+const trustProxy = process.env.TRUST_PROXY;
+if (trustProxy && trustProxy !== "0") {
+  app.set("trust proxy", Number(trustProxy) || trustProxy);
+}
 
 app.use((_req, res, next) => {
   res.set({
@@ -119,8 +133,12 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-function createRateLimiter({ windowMs, max, message }) {
+function createRateLimiter({ windowMs, max, message, globalMax = 0 }) {
   const clients = new Map();
+  /* Compteur global, indépendant de l'IP : il borne le nombre total de
+     requêtes même si l'IP du client n'est pas fiable (proxy mal configuré) ou
+     si l'attaque est répartie sur de nombreuses adresses. */
+  let global = { count: 0, resetAt: 0 };
   const cleanup = setInterval(() => {
     const now = Date.now();
     for (const [key, value] of clients) {
@@ -130,17 +148,27 @@ function createRateLimiter({ windowMs, max, message }) {
   cleanup.unref();
   return (req, res, next) => {
     const now = Date.now();
-    const key = req.socket.remoteAddress || "unknown";
+    const tooMany = () => {
+      res.set("Retry-After", String(Math.ceil(windowMs / 1000)));
+      return res.status(429).json({ success: false, message });
+    };
+
+    if (globalMax > 0) {
+      if (global.resetAt <= now) global = { count: 0, resetAt: now + windowMs };
+      global.count += 1;
+      if (global.count > globalMax) return tooMany();
+    }
+
+    /* req.ip tient compte du réglage TRUST_PROXY et retombe sur l'adresse de
+       la socket lorsque aucun proxy n'est déclaré. */
+    const key = req.ip || req.socket.remoteAddress || "unknown";
     const current = clients.get(key);
     if (!current || current.resetAt <= now) {
       clients.set(key, { count: 1, resetAt: now + windowMs });
       return next();
     }
     current.count += 1;
-    if (current.count > max) {
-      res.set("Retry-After", String(Math.ceil((current.resetAt - now) / 1000)));
-      return res.status(429).json({ success: false, message });
-    }
+    if (current.count > max) return tooMany();
     next();
   };
 }
@@ -148,6 +176,10 @@ function createRateLimiter({ windowMs, max, message }) {
 const loginLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5,
+  /* Plafond global : 60 tentatives de connexion par quart d'heure, toutes IP
+     confondues. Le bruteforce reste ainsi borné même si l'attribution d'IP
+     est faussée par un proxy. */
+  globalMax: 60,
   message: "Trop de tentatives. Réessayez dans quelques minutes.",
 });
 const contactLimiter = createRateLimiter({
@@ -517,13 +549,49 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
       subject: `Nouveau message depuis le site - ${subject || "Demande"}`,
       text: `Nouveau message reçu\n\nNom : ${name}\nEmail : ${email}\nTéléphone : ${phone || "Non renseigné"}\nSujet : ${subject || "Demande via le site"}\n\nMessage :\n${message}`,
       html: `
-        <h3>Nouveau message reçu</h3>
-        <p><strong>Nom :</strong> ${escapeHtml(name)}</p>
-        <p><strong>Email :</strong> ${escapeHtml(email)}</p>
-        <p><strong>Téléphone :</strong> ${escapeHtml(phone || "Non renseigné")}</p>
-        <p><strong>Sujet :</strong> ${escapeHtml(subject || "Demande via le site")}</p>
-        <p><strong>Message :</strong></p>
-        <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>
+        <div style="margin:0;padding:32px 12px;background-color:#f3f6f3;font-family:Arial,Helvetica,sans-serif;color:#17231c">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:620px;margin:0 auto;background-color:#ffffff;border:1px solid #dfe8e1;border-radius:12px;overflow:hidden">
+            <tr>
+              <td style="padding:24px 28px;background-color:#176537;border-bottom:4px solid #bf9b30">
+                <div style="font-size:12px;font-weight:bold;letter-spacing:1px;color:#d4ecdb">EEJ-C · CONTACT</div>
+                <div style="margin-top:8px;font-size:23px;line-height:1.3;font-weight:bold;color:#ffffff">Nouveau message reçu</div>
+                <div style="margin-top:5px;font-size:14px;line-height:1.5;color:#e8f2eb">Église des Envoyés de Jésus-Christ</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:26px 28px 12px">
+                <div style="font-size:12px;font-weight:bold;letter-spacing:.7px;text-transform:uppercase;color:#64806d">Coordonnées</div>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:12px;border-collapse:collapse">
+                  <tr>
+                    <td style="padding:10px 0;border-bottom:1px solid #edf1ed;font-size:14px;color:#64806d;width:105px">Nom</td>
+                    <td style="padding:10px 0;border-bottom:1px solid #edf1ed;font-size:14px;font-weight:bold;color:#17231c">${escapeHtml(name)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0;border-bottom:1px solid #edf1ed;font-size:14px;color:#64806d">E-mail</td>
+                    <td style="padding:10px 0;border-bottom:1px solid #edf1ed;font-size:14px;color:#176537"><a href="mailto:${escapeHtml(email)}" style="color:#176537;text-decoration:underline">${escapeHtml(email)}</a></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0;border-bottom:1px solid #edf1ed;font-size:14px;color:#64806d">Téléphone</td>
+                    <td style="padding:10px 0;border-bottom:1px solid #edf1ed;font-size:14px;color:#17231c">${escapeHtml(phone || "Non renseigné")}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0;font-size:14px;color:#64806d">Sujet</td>
+                    <td style="padding:10px 0;font-size:14px;font-weight:bold;color:#17231c">${escapeHtml(subject || "Demande via le site")}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 28px 28px">
+                <div style="margin-bottom:10px;font-size:12px;font-weight:bold;letter-spacing:.7px;text-transform:uppercase;color:#64806d">Message</div>
+                <div style="padding:16px 18px;background-color:#f3f6f3;border-left:3px solid #bf9b30;border-radius:4px;font-size:15px;line-height:1.7;color:#26382c;white-space:normal">${escapeHtml(message).replace(/\n/g, "<br />")}</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 28px;border-top:1px solid #edf1ed;font-size:12px;line-height:1.5;color:#758579">Ce message a été envoyé depuis le formulaire de contact du site EEJ-C.</td>
+            </tr>
+          </table>
+        </div>
       `,
     });
 
@@ -556,4 +624,9 @@ app.get("*", (_req, res) => {
 
 app.listen(port, () => {
   console.log(`Backend listening on http://localhost:${port}`);
+  console.log(
+    `Mode : ${isProduction ? "production (HSTS + CSP actifs)" : "développement"} | trust proxy : ${
+      app.get("trust proxy") || "désactivé"
+    }`
+  );
 });

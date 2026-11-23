@@ -33,7 +33,7 @@ export const church = {
     addressShort: "Alaglo, Lomé",
     phone: "+228 90 10 72 00",
     phone2: "+228 07 00 00 00 00",
-    email: "arnaudgadji675@gmail.com",
+    email: "eejc2026@gmail.com",
     hours: "Secrétariat : du lundi au vendredi, de 9 h à 17 h",
   },
   social: {
