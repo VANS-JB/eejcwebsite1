@@ -31,12 +31,22 @@ Le fichier `.env` ne doit jamais être ajouté à Git. Le serveur de production 
 exposé uniquement derrière HTTPS.
 
 `PUBLIC_URL` doit contenir l'adresse publique complète du site afin de générer les liens
-de désinscription. `DATA_DIR` indique le dossier persistant qui contient les annonces et
-les abonnés (par défaut `./data`).
+de désinscription. `DATA_DIR` indique le dossier persistant qui contient les annonces,
+les prédications et les abonnés (par défaut `./data`).
+
+## Pages publiques
+
+- `/annexes` présente les lieux de culte et leurs itinéraires.
+- `/programmes` reprend le calendrier hebdomadaire et les annonces.
+- `/messages` archive les prédications ; chaque prédication publiée a sa propre URL.
+
+Ces pages sont pré-rendues au build. Les nouvelles prédications sont aussi rendues à la demande par Express et ajoutées au sitemap dynamique.
 
 ## Administration
 
-L'espace `/admin` permet de gérer les annonces. Les connexions et formulaires publics
+L'espace `/admin` permet de gérer les annonces et les prédications. Pour publier un message, renseignez la date, le jour du culte (lundi, mercredi, vendredi ou dimanche), le titre, le prédicateur et le résumé. Ajoutez au moins un lien HTTPS vidéo ou audio ; les deux formats peuvent être ajoutés. Les messages sont conservés dans `data/messages.json`.
+
+Les connexions et formulaires publics
 sont limités afin de réduire les tentatives automatisées. Les données de newsletter sont
 stockées localement dans `data/newsletter.json` : ce fichier doit être sauvegardé et son
 accès réservé au compte qui exécute le serveur.

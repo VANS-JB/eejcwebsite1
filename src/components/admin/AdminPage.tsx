@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
+  BookOpen,
   Check,
   Lock,
   LogOut,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { btnPrimary } from "@/components/ui";
+import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
 
 type Announcement = { date: string; tag: string; title: string; text: string };
 type Subscriber = { email: string; subscribedAt: string };
@@ -35,6 +37,7 @@ export function AdminPage() {
   const [campaign, setCampaign] = useState({ subject: "", message: "" });
   const [campaignBusy, setCampaignBusy] = useState(false);
   const [campaignNotice, setCampaignNotice] = useState("");
+  const [activeSection, setActiveSection] = useState("annonces");
 
   useEffect(() => {
     if (!token) return;
@@ -217,22 +220,22 @@ export function AdminPage() {
 
   return (
     <div className="min-h-screen bg-cream">
-      <header className="bg-brand-900 text-white">
-        <div className="container-x flex items-center justify-between gap-4 py-4">
+      <header className="sticky top-0 z-30 border-b border-line bg-white/95 text-ink backdrop-blur">
+        <div className="container-x flex items-center justify-between gap-4 py-3">
           <div className="flex items-center gap-3">
-            <Logo variant="light" />
-            <span className="hidden text-sm text-brand-100 sm:inline">Espace d’administration</span>
+            <Logo />
+            <span className="hidden border-l border-line pl-3 text-sm font-medium text-body sm:inline">Administration</span>
           </div>
           <div className="flex items-center gap-2">
             <a
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-semibold text-body transition hover:bg-cream hover:text-ink"
             >
               <ArrowLeft className="h-4 w-4" /> Voir le site
             </a>
             <button
               onClick={logout}
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-body transition hover:bg-red-50 hover:text-red-700"
             >
               <LogOut className="h-4 w-4" /> Déconnexion
             </button>
@@ -240,11 +243,45 @@ export function AdminPage() {
         </div>
       </header>
 
-      <main className="container-x py-10">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="container-x flex flex-col gap-6 py-6 md:flex-row md:items-start md:gap-6 md:py-8">
+        <aside className="shrink-0 md:sticky md:top-24 md:w-60">
+          <div className="overflow-hidden rounded-xl bg-brand-900 text-white shadow-lg shadow-brand-900/10">
+            <div className="hidden border-b border-white/10 px-5 pb-5 pt-6 md:block">
+              <Logo variant="light" mark={38} />
+              <div className="mt-6 flex items-center justify-between">
+                <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-brand-200">Espace admin</p>
+                <span className="rounded-md border border-white/15 px-2 py-1 text-[0.6rem] font-semibold uppercase tracking-wider text-brand-100">EEJ-C</span>
+              </div>
+            </div>
+            <nav aria-label="Navigation administration" className="flex gap-1 overflow-x-auto p-2 md:flex-col md:gap-1.5 md:overflow-visible md:p-3">
+              <a href="#annonces" onClick={() => setActiveSection("annonces")} aria-current={activeSection === "annonces" ? "page" : undefined} className={`group relative inline-flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition lg:px-3.5 ${activeSection === "annonces" ? "bg-white font-bold text-brand-900 shadow-sm" : "font-medium text-brand-100 hover:bg-white/10 hover:text-white"}`}>
+                <Megaphone className={`h-4 w-4 ${activeSection === "annonces" ? "text-accent-600" : "text-brand-300"}`} /> Annonces
+                <span className={`ml-auto hidden min-w-7 rounded-md px-2 py-0.5 text-center text-xs md:inline ${activeSection === "annonces" ? "bg-brand-50 text-brand-800" : "bg-white/10 text-brand-100"}`}>{announcements.length}</span>
+              </a>
+              <a href="#predications" onClick={() => setActiveSection("predications")} aria-current={activeSection === "predications" ? "page" : undefined} className={`group relative inline-flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition lg:px-3.5 ${activeSection === "predications" ? "bg-white font-bold text-brand-900 shadow-sm" : "font-medium text-brand-100 hover:bg-white/10 hover:text-white"}`}>
+                <BookOpen className={`h-4 w-4 ${activeSection === "predications" ? "text-accent-600" : "text-brand-300"}`} /> Prédications
+              </a>
+              <a href="#newsletter" onClick={() => setActiveSection("newsletter")} aria-current={activeSection === "newsletter" ? "page" : undefined} className={`group relative inline-flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition lg:px-3.5 ${activeSection === "newsletter" ? "bg-white font-bold text-brand-900 shadow-sm" : "font-medium text-brand-100 hover:bg-white/10 hover:text-white"}`}>
+                <Mail className={`h-4 w-4 ${activeSection === "newsletter" ? "text-accent-600" : "text-brand-300"}`} /> Newsletter
+                <span className={`ml-auto hidden min-w-7 rounded-md px-2 py-0.5 text-center text-xs md:inline ${activeSection === "newsletter" ? "bg-brand-50 text-brand-800" : "bg-white/10 text-brand-100"}`}>{subscribers.length}</span>
+              </a>
+            </nav>
+            <div className="hidden border-t border-white/10 px-5 py-4 md:block">
+              <p className="text-xs font-semibold text-brand-100">Modifications en attente ?</p>
+              <p className="mt-1 text-xs leading-relaxed text-brand-200">Pensez à enregistrer avant de quitter cette page.</p>
+            </div>
+          </div>
+        </aside>
+
+        <main className="min-w-0 flex-1">
+        <section id="annonces" className="scroll-mt-24">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-600">Contenu du site</p>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-ink">
-            <Megaphone className="h-6 w-6 text-accent-500" /> Annonces
+            Annonces
           </h1>
+          </div>
           <span className="rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-ink shadow-sm">
             {announcements.length} annonce{announcements.length > 1 ? "s" : ""}
           </span>
@@ -393,9 +430,14 @@ export function AdminPage() {
             </button>
           </div>
         </div>
+        </section>
+
+        <div id="predications" className="scroll-mt-24">
+          <MessagesAdmin token={token} />
+        </div>
 
         {/* Newsletter */}
-        <section className="mt-12 rounded-3xl border border-line bg-white p-6 shadow-sm sm:p-8">
+        <section id="newsletter" className="mt-12 scroll-mt-24 border-t border-line pt-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h2 className="flex items-center gap-2 text-xl font-bold text-ink">
@@ -505,7 +547,8 @@ export function AdminPage() {
         {error && (
           <p className="mt-4 text-center text-sm font-medium text-red-600">{error}</p>
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

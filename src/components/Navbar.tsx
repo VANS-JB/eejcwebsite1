@@ -9,7 +9,7 @@ import { cn } from "@/utils/cn";
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState("#accueil");
+  const [active, setActive] = useState("");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -28,7 +28,10 @@ export function Navbar() {
   }, [open]);
 
   useEffect(() => {
-    const ids = navItems.map((n) => n.href.slice(1));
+    setActive(window.location.pathname);
+    const ids = navItems
+      .filter((item) => item.href.includes("#"))
+      .map((item) => item.href.split("#")[1]);
     const sections = ids
       .map((id) => document.getElementById(id))
       .filter(Boolean) as HTMLElement[];
@@ -96,7 +99,7 @@ export function Navbar() {
         )}
       >
         <nav className="container-x flex h-[4.5rem] items-center justify-between">
-          <a href="#accueil" aria-label="Accueil">
+          <a href="/" aria-label="Accueil">
             <Logo />
           </a>
           <ul className="hidden items-center gap-1 lg:flex">
@@ -106,14 +109,20 @@ export function Navbar() {
                   href={item.href}
                   className={cn(
                     "relative rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
-                    active === item.href ? "text-brand-600" : "text-ink hover:text-brand-600"
+                    (item.href.startsWith("/#") && active === `#${item.href.split("#")[1]}`) ||
+                    (!item.href.includes("#") && active === item.href)
+                      ? "text-brand-600"
+                      : "text-ink hover:text-brand-600"
                   )}
                 >
                   {item.label}
                   <span
                     className={cn(
                       "absolute inset-x-3.5 -bottom-0.5 h-0.5 origin-center rounded-full bg-accent-500 transition-transform duration-300",
-                      active === item.href ? "scale-x-100" : "scale-x-0"
+                      (item.href.startsWith("/#") && active === `#${item.href.split("#")[1]}`) ||
+                        (!item.href.includes("#") && active === item.href)
+                        ? "scale-x-100"
+                        : "scale-x-0"
                     )}
                   />
                 </a>
@@ -121,7 +130,7 @@ export function Navbar() {
             ))}
           </ul>
           <div className="flex items-center gap-3">
-            <a href="#don" className={cn(btnAccent, "hidden sm:inline-flex")}>
+            <a href="/#don" className={cn(btnAccent, "hidden sm:inline-flex")}>
               <Heart className="h-4 w-4" /> Nous soutenir
             </a>
             <button
@@ -155,7 +164,10 @@ export function Navbar() {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "block rounded-xl px-3 py-3 text-base font-semibold transition-colors",
-                  active === item.href ? "bg-brand-50 text-brand-600" : "text-ink hover:bg-cream"
+                  (item.href.startsWith("/#") && active === `#${item.href.split("#")[1]}`) ||
+                    (!item.href.includes("#") && active === item.href)
+                    ? "bg-brand-50 text-brand-600"
+                    : "text-ink hover:bg-cream"
                 )}
               >
                 {item.label}
@@ -163,7 +175,7 @@ export function Navbar() {
             </li>
           ))}
           <li className="px-1 pt-2">
-            <a href="#don" onClick={() => setOpen(false)} className={cn(btnAccent, "w-full")}>
+            <a href="/#don" onClick={() => setOpen(false)} className={cn(btnAccent, "w-full")}>
               <Heart className="h-4 w-4" /> Nous soutenir
             </a>
           </li>
