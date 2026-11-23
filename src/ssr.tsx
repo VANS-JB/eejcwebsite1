@@ -38,18 +38,18 @@ function metadataFor(pathname: string, sermons: Sermon[]) {
       return {
         title: `${sermon.title} | EEJ-C`,
         description: sermon.excerpt,
-        canonical: `https://www.eej-c.org/messages/${encodeURIComponent(sermon.slug)}`,
+        canonical: `https://eejctogo.org/messages/${encodeURIComponent(sermon.slug)}`,
       };
     }
     return {
       title: "Prédication introuvable | EEJ-C",
       description: "Cette prédication n’est pas disponible dans l’archive de l’EEJ-C.",
-      canonical: "https://www.eej-c.org/messages",
+      canonical: "https://eejctogo.org/messages",
       noindex: true,
     };
   }
   const page = pages[cleanPath] ?? pages["/"];
-  return { ...page, canonical: `https://www.eej-c.org${cleanPath === "/" ? "/" : cleanPath}` };
+  return { ...page, canonical: `https://eejctogo.org${cleanPath === "/" ? "/" : cleanPath}` };
 }
 
 export function renderPage(template: string, pathname: string, sermons: Sermon[]) {

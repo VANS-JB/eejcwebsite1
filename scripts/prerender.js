@@ -18,6 +18,6 @@ for (const route of routes) {
   await writeFile(output, renderPage(template, route, sermons));
 }
 
-const urls = routes.map((route) => `  <url><loc>https://www.eej-c.org${route === "/" ? "/" : route}</loc></url>`).join("\n");
+const urls = routes.map((route) => `  <url><loc>https://eejctogo.org${route === "/" ? "/" : route}</loc></url>`).join("\n");
 await writeFile(path.join(dist, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
 console.log(`Pre-rendered ${routes.length} pages and updated dist/sitemap.xml`);

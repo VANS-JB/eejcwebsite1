@@ -680,8 +680,9 @@ app.use("/api", (_req, res) => {
 });
 
 app.get("/sitemap.xml", (_req, res) => {
+  const baseUrl = (process.env.PUBLIC_URL || "https://eejctogo.org").replace(/\/$/, "");
   const routes = ["/", "/annexes", "/programmes", "/messages", ...loadMessages().map((message) => `/messages/${message.slug}`)];
-  const urls = routes.map((route) => `  <url><loc>https://www.eej-c.org${route === "/" ? "/" : route}</loc></url>`).join("\n");
+  const urls = routes.map((route) => `  <url><loc>${baseUrl}${route === "/" ? "/" : route}</loc></url>`).join("\n");
   res.type("application/xml").send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
 });
 
