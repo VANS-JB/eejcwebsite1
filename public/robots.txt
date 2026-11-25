@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://www.eej-c.org/sitemap.xml
+Sitemap: https://eejctogo.org/sitemap.xml
